@@ -118,3 +118,17 @@ unsigned short random16(void)
 
     return r16;
 }
+
+__sfr __at 0x01 keyport;
+void scan_row_6(struct keyrow_6 *k6)
+{
+    unsigned char *cast = (unsigned char *)k6;
+    keyport = 0xfe;
+    *cast = ~keyport;
+}
+void scan_row_0(struct keyrow_0 *k0)
+{
+    unsigned char *cast = (unsigned char *)k0;
+    keyport = 0xbf;
+    *cast = ~keyport;
+}
