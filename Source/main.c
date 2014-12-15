@@ -12,7 +12,7 @@ unsigned char running;
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
-#define WORLD_WIDTH 129
+#define WORLD_WIDTH 257
 #define LANDER_WIDTH 20
 unsigned int camera;
 unsigned int moonwidth;
@@ -22,6 +22,7 @@ unsigned char moon[WORLD_WIDTH];
 lock_t evt_lock;
 typedef enum {
     NONE,
+    QUIT,
     REDRAW
 } event_t;
 event_t events[EVENT_MAX];
@@ -32,27 +33,58 @@ event_t get_event(void);
 void init(void);
 void redraw(void);
 void perfcheck(void);
+void read_keys(void);
 void timer_callback(void);
 
 int main(void)
 {
     init();
     while (running) {
-        event_t e = get_event();
-        if (e == REDRAW) {
-            redraw();
-            frames++;
-        }
-        perfcheck();
-        if (ticks % 32 == 0) {
-            add_event(REDRAW);
-        }
-        if (!is_locked(lcd_lock)) {
+        event_t e;
+
+        read_keys();
+        do {
+            e = get_event();
+            if (e == REDRAW) {
+                redraw();
+                frames++;
+            } else if (e == QUIT) {
+                running = false;
+            }
+            perfcheck();
+        } while (e != NONE);
+
+        if (running) {
             idle();
+            if (ticks % 32 == 0) {
+                add_event(REDRAW);
+            }
         }
     }
 
     return 0;
+}
+
+void read_keys(void)
+{
+    struct keyrow_6 k6;
+    struct keyrow_0 k0;
+    scan_row_6(&k6);
+    scan_row_0(&k0);
+    if (k6.K_RIGHT) {
+        if (camera+SCREEN_WIDTH < WORLD_WIDTH-1) {
+            camera++;
+        }
+    }
+    if (k6.K_LEFT) {
+        if (camera > 0) {
+            camera--;
+        }
+    }
+
+    if (k0.K_EXIT) {
+        running = false;
+    }
 }
 
 void generate_moon(void)
@@ -75,6 +107,9 @@ void generate_moon(void)
 
     landingpad = random16()%(WORLD_WIDTH-1);
     landingheight = random8()%(SCREEN_HEIGHT/2);
+    if (landingpad > WORLD_WIDTH-21) {
+        landingpad = WORLD_WIDTH-21;
+    }
     if (landingheight < 10) {
         landingheight = 10;
     }
