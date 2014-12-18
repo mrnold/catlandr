@@ -45,6 +45,27 @@ void clear_screen(void) __naked
     __endasm;
 }
 
+void clear_buffer(void) __naked
+{
+    __asm
+        push af
+        push bc
+        push de
+        push hl
+        ld hl, #_screenbuffer
+        xor a
+        ld (hl), a
+        ld bc, #0x03ff
+        ld de, #_screenbuffer+1
+        ldir
+        pop hl
+        pop de
+        pop bc
+        pop af
+        ret
+    __endasm;
+}
+
 void timer_isr(void) __naked
 {
     __asm
@@ -131,4 +152,21 @@ void scan_row_0(struct keyrow_0 *k0)
     unsigned char *cast = (unsigned char *)k0;
     keyport = 0xbf;
     *cast = ~keyport;
+}
+
+void screencopy(void) __naked
+{
+    __asm
+        push bc
+        push de
+        push hl
+        ld hl, #_screenbuffer
+        ld de, #0xfc00
+        ld bc, #1024
+        ldir
+        pop hl
+        pop de
+        pop bc
+        ret
+    __endasm;
 }

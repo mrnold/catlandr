@@ -4,7 +4,8 @@
 #define true 1
 #define false 0
 
-lock_t lcd_lock;
+lock_t lcd;
+lock_t main_lock;
 unsigned int ticks;
 unsigned int frames;
 unsigned int dropped;
@@ -12,18 +13,45 @@ unsigned char running;
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
-#define WORLD_WIDTH 257
-#define LANDER_WIDTH 20
+#define WORLD_WIDTH 1025
+#define LANDINGPAD_WIDTH 20
+#define LANDER_WIDTH 8
+#define LANDER_HEIGHT 8
 unsigned int camera;
 unsigned int moonwidth;
 unsigned char moon[WORLD_WIDTH];
+struct {
+    unsigned short x;
+    unsigned char y;
+    struct {
+        char x, y;
+    } momentum;
+    struct {
+        char x, y;
+    } acceleration;
+    unsigned char bitmap[LANDER_WIDTH];
+} lander;
+
+unsigned char screenbuffer[1024];
 
 #define EVENT_MAX 16
 lock_t evt_lock;
 typedef enum {
     NONE,
     QUIT,
-    REDRAW
+    WORLD_REDRAW,
+    IMPULSE_LEFT,
+    IMPULSE_RIGHT,
+    IMPULSE_DOWN,
+    IMPULSE_UP,
+    PHYSICS,
+    READ_KEYS,
+    CLEAR_SCREEN,
+    CLEAR_BUFFER,
+    SCREEN_COPY,
+    DRAW_MOON,
+    DRAW_LANDER,
+    SIGNAL_GO
 } event_t;
 event_t events[EVENT_MAX];
 unsigned char current_event;
@@ -31,9 +59,12 @@ void add_event(event_t);
 event_t get_event(void);
 
 void init(void);
-void redraw(void);
+void physics(void);
 void perfcheck(void);
 void read_keys(void);
+void draw_moon(void);
+void draw_lander(void);
+void world_redraw(void);
 void timer_callback(void);
 
 int main(void)
@@ -42,48 +73,176 @@ int main(void)
     while (running) {
         event_t e;
 
-        read_keys();
+        wait_lock(main_lock);
         do {
             e = get_event();
-            if (e == REDRAW) {
-                redraw();
+            if (e == SIGNAL_GO) {
+                read_keys();
+                physics();
+                clear_buffer();
+                draw_moon();
+                clear_screen();
+                screencopy();
+                draw_lander();
                 frames++;
+            } else if (e == IMPULSE_RIGHT) {
+                if (lander.acceleration.x < 10 && lander.x < SCREEN_WIDTH-LANDER_WIDTH) {
+                    lander.acceleration.x++;
+                }
+            } else if (e == IMPULSE_LEFT) {
+                if (lander.acceleration.x > -10 && lander.x > 0) {
+                    lander.acceleration.x--;
+                }
+            } else if (e == IMPULSE_UP) {
+                if (lander.acceleration.y > -10 && lander.y > 0) {
+                    lander.acceleration.y--;
+                }
+            } else if (e == IMPULSE_DOWN) {
+                if (lander.acceleration.y < 10 && lander.y < SCREEN_HEIGHT-LANDER_HEIGHT) {
+                    lander.acceleration.y++;
+                }
+            } else if (e == READ_KEYS) {
+                read_keys();
+            } else if (e == WORLD_REDRAW) {
+                world_redraw();
+            } else if (e == PHYSICS) {
+                physics();
+            } else if (e == CLEAR_SCREEN) {
+                clear_screen();
+            } else if (e == CLEAR_BUFFER) {
+                clear_buffer();
+            } else if (e == DRAW_MOON) {
+                draw_moon();
+            } else if (e == SCREEN_COPY) {
+                screencopy();
+            } else if (e == DRAW_LANDER) {
+                draw_lander();
             } else if (e == QUIT) {
                 running = false;
             }
-            perfcheck();
         } while (e != NONE);
+        drop_lock(main_lock);
 
         if (running) {
+            perfcheck();
             idle();
-            if (ticks % 32 == 0) {
-                add_event(REDRAW);
-            }
         }
     }
 
     return 0;
 }
 
+void physics(void)
+{
+    unsigned int landerlimit;
+    unsigned int cameralimit;
+    int scratch;
+
+    lander.momentum.x += lander.acceleration.x;
+    if (lander.momentum.x > 50) {
+        lander.momentum.x = 50;
+    } else if (lander.momentum.x < -50) {
+        lander.momentum.x = -50;
+    }
+
+    landerlimit = WORLD_WIDTH-LANDER_WIDTH;
+    scratch = (int)lander.x + (int)lander.momentum.x;
+    if (scratch >= (int)landerlimit) {
+        lander.x = landerlimit;
+        lander.acceleration.x = 0;
+        lander.momentum.x =0;
+    } else if (scratch <= 0) {
+        lander.acceleration.x = 0;
+        lander.momentum.x = 0;
+        lander.x = 0;
+    } else {
+        lander.x = (unsigned int)scratch;
+    }
+
+    scratch = lander.x-camera;
+    if (scratch < LANDER_WIDTH) {
+        scratch = lander.x-LANDER_WIDTH;
+        if (scratch < 0) {
+            camera = 0;
+        } else {
+            camera = scratch;
+        }
+    }
+
+    scratch = camera+SCREEN_WIDTH-lander.x;
+    if (scratch < 2*LANDER_WIDTH) {
+        scratch = lander.x+2*LANDER_WIDTH-SCREEN_WIDTH;
+        if (scratch+SCREEN_WIDTH > WORLD_WIDTH) {
+            camera = WORLD_WIDTH-SCREEN_WIDTH;
+        } else {
+            camera = scratch;
+        }
+    }
+
+
+    lander.momentum.y += lander.acceleration.y;
+    if (lander.momentum.y > 50) {
+        lander.momentum.y = 50;
+    } else if (lander.momentum.y < -50) {
+        lander.momentum.y = -50;
+    }
+
+    if (lander.momentum.y > 0) { //Screen down
+        landerlimit = SCREEN_HEIGHT-LANDER_HEIGHT;
+        lander.y += lander.momentum.y/4;
+        if (lander.y > landerlimit) {
+            lander.y = landerlimit;
+            lander.momentum.y = 0;
+            lander.acceleration.y = 0;
+        }
+    } else if (lander.momentum.y < 0) { //Screen up
+        scratch = lander.y + lander.momentum.y/4;
+        if (scratch < 0) {
+            lander.y = 0;
+            lander.momentum.y = 0;
+            if (lander.acceleration.y < -1) {
+                lander.acceleration.y = -1;
+            }
+        } else {
+            lander.y = scratch;
+        }
+    }
+
+}
+
 void read_keys(void)
 {
     struct keyrow_6 k6;
     struct keyrow_0 k0;
+
     scan_row_6(&k6);
     scan_row_0(&k0);
+
     if (k6.K_RIGHT) {
-        if (camera+SCREEN_WIDTH < WORLD_WIDTH-1) {
-            camera++;
+        if (lander.acceleration.x < 10 && lander.x < WORLD_WIDTH-LANDER_WIDTH-1) {
+            lander.acceleration.x++;
         }
     }
     if (k6.K_LEFT) {
-        if (camera > 0) {
-            camera--;
+        if (lander.acceleration.x > -10 && lander.x > 0) {
+            lander.acceleration.x--;
         }
     }
-
+    if (!k6.K_RIGHT && !k6.K_LEFT && lander.acceleration.x != 0) {
+        lander.acceleration.x = 0;
+    }
+    if (k6.K_UP) {
+        if (lander.acceleration.y > -10 && lander.y > 0) {
+            lander.acceleration.y--;
+        }
+    } else {
+        if (lander.acceleration.y != 0) {
+            lander.acceleration.y = 1;
+        }
+    }
+    
     if (k0.K_EXIT) {
-        running = false;
+        add_event(QUIT);
     }
 }
 
@@ -113,12 +272,12 @@ void generate_moon(void)
     if (landingheight < 10) {
         landingheight = 10;
     }
-    if (landingpad+LANDER_WIDTH > WORLD_WIDTH) {
+    if (landingpad+LANDINGPAD_WIDTH > WORLD_WIDTH) {
         for (i = landingpad; i < WORLD_WIDTH-landingpad; i++) {
             moon[i] = landingheight;
         }
     } else {
-        for (i = landingpad; i < landingpad+LANDER_WIDTH; i++) {
+        for (i = landingpad; i < landingpad+LANDINGPAD_WIDTH; i++) {
             moon[i] = landingheight;
         }
     }
@@ -181,33 +340,72 @@ event_t get_event(void)
 
 void init(void)
 {
+    ticks = 0;
     camera = 0;
     frames = 0;
     dropped = 0;
+    lander.y = 0;
     running = true;
     current_event = 0;
     moonwidth = WORLD_WIDTH;
+    lander.x = SCREEN_WIDTH/2;
+    lander.momentum.x = 0;
+    lander.momentum.y = 0;
+    lander.acceleration.x = 0;
+    lander.acceleration.y = 1;
+
+    lander.bitmap[0] = 0b00011000;
+    lander.bitmap[1] = 0b01111110;
+    lander.bitmap[2] = 0b11100111;
+    lander.bitmap[3] = 0b01111110;
+    lander.bitmap[4] = 0b00011000;
+    lander.bitmap[5] = 0b00100100;
+    lander.bitmap[6] = 0b01111110;
+    lander.bitmap[7] = 0b11000011;
 
     generate_moon();
-    init_lock(lcd_lock);
     init_lock(evt_lock);
-    add_event(REDRAW);
+    init_lock(lcd);
+    init_lock(main_lock);
     setup_timer(&timer_callback);
 }
 
 void timer_callback(void)
 {
-    ticks++;
+    if (is_locked(main_lock)) {
+        dropped++;
+    } else {
+        ticks++;
+
+        if (ticks%8 == 0) {
+            add_event(SIGNAL_GO);
+        }
+    }
 }
 
 void draw_vertical(unsigned short x, unsigned char height)
 {
     unsigned char *i;
-    unsigned char *screen = (unsigned char *)0xfc00;
+    unsigned char *screen = (unsigned char *)screenbuffer;
     unsigned int start = x/8+height*16;
 
-    for (i = screen+start; i > screen; i += 16) {
+    for (i = screen+start; i < screen+1024; i += 16) {
         *i |= (0x80 >> (x%8));
+    }
+}
+
+void draw_lander(void)
+{
+    unsigned char i;
+    unsigned char x = lander.x-camera;
+    unsigned char *screen = (unsigned char *)0xfc00;
+    unsigned int start = x/8+lander.y*16;
+    unsigned char *screenbyte = screen+start;
+    for (i = 0; i < LANDER_HEIGHT; i++) {
+        unsigned char shift = x%8;
+        *screenbyte |= (lander.bitmap[i] >> shift);
+        *(screenbyte+1) |= (lander.bitmap[i] << (8-shift));
+        screenbyte += 16;
     }
 }
 
@@ -219,17 +417,21 @@ void draw_moon(void)
     }
 }
 
-void redraw(void)
+void world_redraw(void)
 {
-    wait_lock(lcd_lock);
-    clear_screen();
+    wait_lock(lcd);
+    clear_buffer();
     draw_moon();
-    drop_lock(lcd_lock);
+    clear_screen();
+    screencopy();
+    draw_lander();
+    frames++;
+    drop_lock(lcd);
 }
 
 void perfcheck(void)
 {
-    if (frames == 100) {
+    if (frames == 1000) {
         running = false;
     }
 }
