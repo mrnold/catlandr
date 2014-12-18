@@ -29,8 +29,49 @@ struct {
     struct {
         char x, y;
     } acceleration;
-    unsigned char bitmap[LANDER_WIDTH];
+    struct {
+        unsigned char hp_stage   : 2; // Horizontal positive
+        unsigned char hp_firing  : 1;
+        unsigned char hn_stage   : 2; // Horizontal negative
+        unsigned char hn_firing  : 1;
+        unsigned char vp_stage   : 2; // Vertical positive (screen down)
+        unsigned char vp_firing  : 1;
+    } thrust;
+    unsigned char *bitmap;
 } lander;
+
+unsigned char img_lander[LANDER_HEIGHT] = {
+    0b00011000,
+    0b01111110,
+    0b11100111,
+    0b01111110,
+    0b00011000,
+    0b00100100,
+    0b01111110,
+    0b11011011
+};
+
+#define THRUST_STAGES 4
+unsigned char img_thrustleft[LANDER_HEIGHT][THRUST_STAGES] = {
+    { 0b00000000, 0b00000000, 0b00000100, 0b00001110 },
+    { 0b00000000, 0b00000110, 0b00011110, 0b00111011 },
+    { 0b01010111, 0b01011101, 0b01111001, 0b11110001 },
+    { 0b00000000, 0b00000110, 0b00011110, 0b00111011 },
+    { 0b00000000, 0b00000000, 0b00000100, 0b00001110 },
+    { 0b00000000, 0b00000000, 0b00000000, 0b00000000 },
+    { 0b00000000, 0b00000000, 0b00000000, 0b00000000 },
+    { 0b00000000, 0b00000000, 0b00000000, 0b00000000 }
+};
+unsigned char img_thrustdown[LANDER_HEIGHT][THRUST_STAGES] = {
+    { 0b00011000, 0b00011000, 0b00011000, 0b00111100 },
+    { 0b00111100, 0b00111100, 0b01100110, 0b01100110 },
+    { 0b00011000, 0b00111100, 0b00100100, 0b11000011 },
+    { 0b00000000, 0b00011000, 0b00011000, 0b11000011 },
+    { 0b00010000, 0b00010000, 0b00001000, 0b01000010 },
+    { 0b00001000, 0b00001000, 0b00010000, 0b00100100 },
+    { 0b00000000, 0b00010000, 0b00001000, 0b00011000 },
+    { 0b00010000, 0b00001000, 0b00010000, 0b00011000 }
+};
 
 unsigned char screenbuffer[1024];
 
@@ -135,14 +176,21 @@ int main(void)
 void physics(void)
 {
     unsigned int landerlimit;
-    unsigned int cameralimit;
     int scratch;
 
     lander.momentum.x += lander.acceleration.x;
-    if (lander.momentum.x > 50) {
-        lander.momentum.x = 50;
-    } else if (lander.momentum.x < -50) {
-        lander.momentum.x = -50;
+    if (lander.momentum.x > 1) {
+        if (lander.momentum.x > 25) {
+            lander.momentum.x = 25;
+        } else {
+            lander.momentum.x--;
+        }
+    } else if (lander.momentum.x < -1) {
+        if (lander.momentum.x < -25) {
+            lander.momentum.x = -25;
+        } else {
+            lander.momentum.x++;
+        }
     }
 
     landerlimit = WORLD_WIDTH-LANDER_WIDTH;
@@ -181,10 +229,10 @@ void physics(void)
 
 
     lander.momentum.y += lander.acceleration.y;
-    if (lander.momentum.y > 50) {
-        lander.momentum.y = 50;
-    } else if (lander.momentum.y < -50) {
-        lander.momentum.y = -50;
+    if (lander.momentum.y > 25) {
+        lander.momentum.y = 25;
+    } else if (lander.momentum.y < -25) {
+        lander.momentum.y = -25;
     }
 
     if (lander.momentum.y > 0) { //Screen down
@@ -208,6 +256,9 @@ void physics(void)
         }
     }
 
+    if (lander.momentum.x == 1 || lander.momentum.x == -1) {
+        lander.momentum.x = 0;
+    }
 }
 
 void read_keys(void)
@@ -222,23 +273,40 @@ void read_keys(void)
         if (lander.acceleration.x < 10 && lander.x < WORLD_WIDTH-LANDER_WIDTH-1) {
             lander.acceleration.x++;
         }
+        lander.thrust.hp_firing = true;
+        lander.thrust.hp_stage++;
+    } else {
+        lander.thrust.hp_firing = false;
+        lander.thrust.hp_stage = 0;
     }
     if (k6.K_LEFT) {
         if (lander.acceleration.x > -10 && lander.x > 0) {
             lander.acceleration.x--;
         }
+        lander.thrust.hn_firing = true;
+        lander.thrust.hn_stage++;
+    } else {
+        lander.thrust.hn_firing = false;
+        lander.thrust.hn_stage = 0;
     }
-    if (!k6.K_RIGHT && !k6.K_LEFT && lander.acceleration.x != 0) {
+
+    if (k6.K_LEFT && k6.K_RIGHT) {
         lander.acceleration.x = 0;
     }
+    if (!k6.K_LEFT && !k6.K_RIGHT) {
+        lander.acceleration.x = 0;
+    }
+
     if (k6.K_UP) {
         if (lander.acceleration.y > -10 && lander.y > 0) {
             lander.acceleration.y--;
         }
+        lander.thrust.vp_firing = true;
+        lander.thrust.vp_stage++;
     } else {
-        if (lander.acceleration.y != 0) {
-            lander.acceleration.y = 1;
-        }
+        lander.acceleration.y = 1;
+        lander.thrust.vp_firing = false;
+        lander.thrust.vp_stage = 0;
     }
     
     if (k0.K_EXIT) {
@@ -353,15 +421,13 @@ void init(void)
     lander.momentum.y = 0;
     lander.acceleration.x = 0;
     lander.acceleration.y = 1;
-
-    lander.bitmap[0] = 0b00011000;
-    lander.bitmap[1] = 0b01111110;
-    lander.bitmap[2] = 0b11100111;
-    lander.bitmap[3] = 0b01111110;
-    lander.bitmap[4] = 0b00011000;
-    lander.bitmap[5] = 0b00100100;
-    lander.bitmap[6] = 0b01111110;
-    lander.bitmap[7] = 0b11000011;
+    lander.bitmap = img_lander;
+    lander.thrust.hp_stage = 0;
+    lander.thrust.hp_firing = 0;
+    lander.thrust.hn_stage = 0;
+    lander.thrust.hn_firing = 0;
+    lander.thrust.vp_stage = 0;
+    lander.thrust.vp_firing = 0;
 
     generate_moon();
     init_lock(evt_lock);
@@ -394,18 +460,98 @@ void draw_vertical(unsigned short x, unsigned char height)
     }
 }
 
+/* Fast byte reversal from:
+ http://www.retroprogramming.com/2014/01/fast-z80-bit-reversal.html
+ First parameter in a, return value in l
+*/
+unsigned char reverse(unsigned char byte) __naked {
+    byte;
+    __asm
+        ld l, a
+        rlca
+        rlca
+        xor l
+        and #0xaa
+        xor l
+        ld l, a
+        rlca
+        rlca
+        rlca
+        rrc l
+        xor l
+        and #0x66
+        xor l
+        ld l, a
+        ret
+    __endasm;
+}
+
 void draw_lander(void)
 {
-    unsigned char i;
+    unsigned char i, y;
     unsigned char x = lander.x-camera;
     unsigned char *screen = (unsigned char *)0xfc00;
     unsigned int start = x/8+lander.y*16;
     unsigned char *screenbyte = screen+start;
+    unsigned char shift = x%8;
+    unsigned char imgbyte;
+
     for (i = 0; i < LANDER_HEIGHT; i++) {
-        unsigned char shift = x%8;
         *screenbyte |= (lander.bitmap[i] >> shift);
         *(screenbyte+1) |= (lander.bitmap[i] << (8-shift));
         screenbyte += 16;
+    }
+
+    if (lander.thrust.hp_firing) { // Draw left thruster
+        x = lander.x-camera-LANDER_WIDTH;
+        start = x/8+lander.y*16;
+        screenbyte = screen+start;
+        shift = x%8;
+        for (i = 0; i < LANDER_HEIGHT; i++) {
+            imgbyte = img_thrustleft[i][lander.thrust.hp_stage];
+            if (lander.x-camera >= LANDER_WIDTH) {
+                *screenbyte |= (imgbyte >> shift);
+            }
+            if (lander.x-camera > 0) {
+                *(screenbyte+1) |= (imgbyte << (8-shift));
+            }
+            screenbyte += 16;
+        }
+    }
+
+    if (lander.thrust.hn_firing) { // Draw right thruster
+        x = lander.x-camera+LANDER_WIDTH;
+        start = x/8+lander.y*16;
+        screenbyte = screen+start;
+        shift = x%8;
+        for (i = 0; i < LANDER_HEIGHT; i++) {
+            imgbyte = img_thrustleft[i][lander.thrust.hn_stage];
+            imgbyte = reverse(imgbyte);
+            if (x < SCREEN_WIDTH) {
+                *screenbyte |= (imgbyte >> shift);
+            }
+            if (x < SCREEN_WIDTH-LANDER_WIDTH) {
+                *(screenbyte+1) |= (imgbyte << (8-shift));
+            }
+            screenbyte += 16;
+        }
+    }
+
+    if (lander.thrust.vp_firing) {
+        x = lander.x-camera;
+        y = lander.y+LANDER_HEIGHT;
+        start = x/8+y*16;
+        screenbyte = screen+start;
+        shift = x%8;
+        for (i = 0; i < LANDER_HEIGHT; i++) {
+            if (i+y > SCREEN_HEIGHT) {
+                break;
+            }
+            imgbyte = img_thrustdown[i][lander.thrust.vp_stage];
+            *screenbyte ^= (imgbyte >> shift);
+            *(screenbyte+1) ^= (imgbyte << (8-shift));
+            screenbyte += 16;
+        }
     }
 }
 
