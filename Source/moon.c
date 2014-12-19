@@ -1,9 +1,10 @@
 #include "lander.h"
+#include "physics.h"
 #include "ti86.h"
 #include "moon.h"
 
 unsigned short landingpad;
-unsigned char moon[MOON_WIDTH];
+__at (MOON_SAFERAM) unsigned char moon[MOON_WIDTH];
 
 void init_moon(void)
 {

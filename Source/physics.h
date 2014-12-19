@@ -3,4 +3,4 @@ void apply_input(void);
 void collisions(void);
 void physics(void);
 
-extern unsigned int previouscamera;
+extern unsigned int camera;
