@@ -4,6 +4,8 @@ static unsigned char r8;
 static unsigned short r16;
 static void (*callback_function)(void);
 
+unsigned char screenbuffer[1024];
+
 void putchar(char c) __naked
 {
     c;
@@ -66,6 +68,8 @@ void clear_buffer(void) __naked
     __endasm;
 }
 
+// Silence compiler warning on "af'"
+#pragma preproc_asm -
 void timer_isr(void) __naked
 {
     __asm
@@ -83,6 +87,7 @@ void timer_isr(void) __naked
         ret
     __endasm;
 }
+#pragma preproc_asm +
 
 void setup_timer(void (*callback)(void))
 {
@@ -169,4 +174,15 @@ void screencopy(void) __naked
         pop bc
         ret
     __endasm;
+}
+
+void draw_vertical(unsigned short x, unsigned char height)
+{
+    unsigned char *i;
+    unsigned char *screen = (unsigned char *)screenbuffer;
+    unsigned int start = x/8+height*16;
+
+    for (i = screen+start; i < screen+1024; i += 16) {
+        *i |= (0x80 >> (x%8));
+    }
 }
