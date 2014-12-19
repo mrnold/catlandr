@@ -1,6 +1,7 @@
 #include "bitmap.h"
 #include "lander.h"
 #include "misc.h"
+#include "physics.h"
 #include "ti86.h"
 
 struct lander_t lander;

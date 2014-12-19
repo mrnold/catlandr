@@ -6,7 +6,14 @@
 #include "physics.h"
 #include "ti86.h"
 
-void init_physics(void) { }
+unsigned int camera;
+unsigned int previouscamera;
+
+void init_physics(void)
+{
+    previouscamera = 0;
+    camera = 0;
+}
 
 void physics(void)
 {

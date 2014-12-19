@@ -12,11 +12,9 @@ unsigned int frames;
 unsigned int dropped;
 unsigned char running;
 
-unsigned int camera;
-unsigned int previouscamera;
-
 void init(void);
 void perfcheck(void);
+void gamesequence(void);
 void timer_callback(void);
 
 lock_t main_lock;
@@ -31,14 +29,7 @@ int main(void)
         do {
             e = get_event();
             if (e == SIGNAL_GO) {
-                apply_input();
-                physics();
-                collisions();
-                clear_buffer();
-                draw_moon();
-                clear_screen();
-                screencopy();
-                draw_lander();
+                gamesequence();
                 frames++;
             } else if (e == QUIT) {
                 running = false;
@@ -55,10 +46,21 @@ int main(void)
     return 0;
 }
 
+void gamesequence(void)
+{
+    apply_input();
+    physics();
+    collisions();
+    clear_buffer();
+    draw_moon();
+    clear_screen();
+    screencopy();
+    draw_lander();
+}
+
 void init(void)
 {
     ticks = 0;
-    camera = 0;
     frames = 0;
     dropped = 0;
     running = true;
