@@ -18,11 +18,17 @@ unsigned char running;
 #define LANDER_WIDTH 8
 #define LANDER_HEIGHT 8
 unsigned int camera;
+unsigned int previouscamera;
+unsigned short landingpad;
 unsigned int moonwidth;
 unsigned char moon[WORLD_WIDTH];
 struct {
     unsigned short x;
     unsigned char y;
+    struct {
+        unsigned short x;
+        unsigned char y;
+    } previous;
     struct {
         char x, y;
     } momentum;
@@ -37,6 +43,9 @@ struct {
         unsigned char vp_stage   : 2; // Vertical positive (screen down)
         unsigned char vp_firing  : 1;
     } thrust;
+    unsigned char crashed;
+    unsigned char landed;
+    unsigned char perched;
     unsigned char *bitmap;
 } lander;
 
@@ -49,6 +58,39 @@ unsigned char img_lander[LANDER_HEIGHT] = {
     0b00100100,
     0b01111110,
     0b11011011
+};
+
+unsigned char img_downcrash[LANDER_HEIGHT] = {
+    0b10000001,
+    0b01000010,
+    0b10000001,
+    0b01000110,
+    0b11100111,
+    0b00111110,
+    0b01111100,
+    0b11001010
+};
+
+unsigned char img_rightcrash[LANDER_HEIGHT] = {
+    0b01000010,
+    0b00100100,
+    0b01000010,
+    0b00101111,
+    0b00011101,
+    0b00001111,
+    0b00001111,
+    0b00110011
+};
+
+unsigned char img_leftcrash[LANDER_HEIGHT] = {
+    0b00100100,
+    0b00010010,
+    0b00100100,
+    0b10101110,
+    0b10111100,
+    0b11101110,
+    0b11111110,
+    0b11110010
 };
 
 #define THRUST_STAGES 4
@@ -104,6 +146,7 @@ void physics(void);
 void perfcheck(void);
 void read_keys(void);
 void draw_moon(void);
+void collisions(void);
 void draw_lander(void);
 void world_redraw(void);
 void timer_callback(void);
@@ -120,6 +163,7 @@ int main(void)
             if (e == SIGNAL_GO) {
                 read_keys();
                 physics();
+                collisions();
                 clear_buffer();
                 draw_moon();
                 clear_screen();
@@ -176,23 +220,32 @@ int main(void)
 void physics(void)
 {
     unsigned int landerlimit;
+    unsigned char feet;
+    unsigned int i;
     int scratch;
 
+    lander.previous.x = lander.x;
+    lander.previous.y = lander.y;
+    previouscamera = camera;
+
     lander.momentum.x += lander.acceleration.x;
-    if (lander.momentum.x > 1) {
-        if (lander.momentum.x > 25) {
-            lander.momentum.x = 25;
-        } else {
-            lander.momentum.x--;
-        }
-    } else if (lander.momentum.x < -1) {
-        if (lander.momentum.x < -25) {
-            lander.momentum.x = -25;
-        } else {
-            lander.momentum.x++;
+    if (lander.x > 0 && lander.x < WORLD_WIDTH-LANDER_WIDTH) {
+        if (lander.momentum.x > 0) {
+            if (lander.momentum.x > 25) {
+                lander.momentum.x = 25;
+            } else {
+                lander.momentum.x--;
+            }
+        } else if (lander.momentum.x < 0) {
+            if (lander.momentum.x < -25) {
+                lander.momentum.x = -25;
+            } else {
+                lander.momentum.x++;
+            }
         }
     }
 
+    feet = lander.y+LANDER_HEIGHT;
     landerlimit = WORLD_WIDTH-LANDER_WIDTH;
     scratch = (int)lander.x + (int)lander.momentum.x;
     if (scratch >= (int)landerlimit) {
@@ -256,8 +309,130 @@ void physics(void)
         }
     }
 
-    if (lander.momentum.x == 1 || lander.momentum.x == -1) {
-        lander.momentum.x = 0;
+    if (lander.momentum.y < 0) {
+        lander.perched = false;
+    }
+
+}
+
+// Note: do this before drawing the lander, but after applying physics
+void collisions(void)
+{
+    unsigned int i;
+    unsigned char max;
+    unsigned char same;
+    unsigned char feet = lander.y+LANDER_HEIGHT;
+    unsigned char edge = lander.x+LANDER_WIDTH;
+
+    if (moon[lander.x] <= feet) { // Screen up is negative
+        same = true;
+        for (i = edge-1; i > lander.x+1; i--) {
+            if (moon[i] != moon[i-1]) {
+                same = false;
+                break;
+            }
+        }
+        if (same) {
+            if (lander.momentum.y > 10) {
+                lander.bitmap = img_downcrash;
+                lander.crashed = true;
+            } else {
+                if (lander.x > landingpad && lander.x < landingpad+LANDINGPAD_WIDTH) {
+                    lander.landed = true;
+                }
+            }
+            lander.y = moon[lander.x]-LANDER_HEIGHT;
+            lander.acceleration.x = 0;
+            lander.acceleration.y = 0;
+            lander.momentum.x = 0;
+            lander.momentum.y = 0;
+            return;
+        } else {
+            if (lander.momentum.y > 10) {
+                lander.bitmap = img_downcrash;
+                lander.crashed = true;
+                lander.y = moon[lander.x]-LANDER_HEIGHT;
+                lander.acceleration.x = 0;
+                lander.acceleration.y = 0;
+                lander.momentum.x = 0;
+                lander.momentum.y = 0;
+                return;
+            } else {
+                lander.momentum.y = -1*lander.momentum.y/2;
+            }
+        }
+    }
+
+    if (lander.momentum.x > 0) {
+        feet = lander.previous.y+LANDER_HEIGHT;
+        edge = lander.previous.x+LANDER_WIDTH;
+        for (i = edge; i < edge+lander.momentum.x; i++) {
+            if (i > WORLD_WIDTH-1) {
+                break;
+            }
+            if (moon[i] < feet) {
+                if (lander.momentum.x > 10) {
+                    lander.bitmap = img_rightcrash;
+                    lander.crashed = true;
+                    lander.x = i-LANDER_WIDTH;
+                    lander.y = lander.previous.y;
+                    lander.acceleration.x = 0;
+                    lander.acceleration.y = 0;
+                    lander.momentum.x = 0;
+                    lander.momentum.y = 0;
+                    camera = previouscamera;
+                    return;
+                } else {
+                    lander.momentum.x = -1*lander.momentum.x/2;
+                    if (lander.momentum.x > -1) {
+                        lander.momentum.x = -1; // Bounce!
+                    }
+                }
+            }
+        }
+    } else if (lander.momentum.x < 0) {
+        feet = lander.previous.y+LANDER_HEIGHT;
+        edge = lander.previous.x;
+        for (i = edge; i > edge+lander.momentum.x; i--) {
+            if (i > edge) {
+                break;
+            }
+            if (moon[i] < feet) {
+                if (lander.momentum.x < -10) {
+                    lander.bitmap = img_leftcrash;
+                    lander.crashed = true;
+                    lander.x = i;
+                    lander.y = lander.previous.y;
+                    lander.acceleration.x = 0;
+                    lander.acceleration.y = 0;
+                    lander.momentum.x = 0;
+                    lander.momentum.y = 0;
+                    camera = previouscamera;
+                    return;
+                } else {
+                    lander.momentum.x = -1*lander.momentum.x/2;
+                    if (lander.momentum.x < 1) {
+                        lander.momentum.x = 1; // Bounce!
+                    }
+                }
+            }
+        }
+    }
+
+    if (lander.momentum.y > 0) {
+        edge = lander.previous.x;
+        max = edge;
+        for (i = edge; i < edge+LANDER_WIDTH; i++) {
+            if (moon[i] < moon[max]) {
+                max = i;
+            }
+        }
+        if (moon[max] < lander.previous.y+lander.momentum.y) {
+            lander.y = moon[max]-LANDER_HEIGHT;
+            lander.perched = true;
+            lander.acceleration.y = 0;
+            lander.momentum.y = 0;
+        }
     }
 }
 
@@ -266,7 +441,13 @@ void read_keys(void)
     struct keyrow_6 k6;
     struct keyrow_0 k0;
 
-    scan_row_6(&k6);
+    if (!lander.crashed && !lander.landed) {
+        scan_row_6(&k6);
+    } else {
+        k6.K_RIGHT = false;
+        k6.K_LEFT = false;
+        k6.K_UP = false;
+    }
     scan_row_0(&k0);
 
     if (k6.K_RIGHT) {
@@ -304,7 +485,9 @@ void read_keys(void)
         lander.thrust.vp_firing = true;
         lander.thrust.vp_stage++;
     } else {
-        lander.acceleration.y = 1;
+        if (!lander.crashed && !lander.perched) {
+            lander.acceleration.y = 1;
+        }
         lander.thrust.vp_firing = false;
         lander.thrust.vp_stage = 0;
     }
@@ -322,7 +505,6 @@ void generate_moon(void)
     unsigned int leftheight, rightheight;
     unsigned int distortion;
     unsigned char rand;
-    unsigned short landingpad;
     unsigned char landingheight;
 
     for (i = 0; i < WORLD_WIDTH; i++) {
@@ -378,6 +560,11 @@ void generate_moon(void)
         stride = i;
         i /= 2;
     }
+
+    // Flip the world around so positive y-axis is screen down
+    for (i = 0; i < WORLD_WIDTH; i++) {
+        moon[i] = SCREEN_HEIGHT-moon[i];
+    }
 }
 
 void add_event(event_t evt)
@@ -428,6 +615,9 @@ void init(void)
     lander.thrust.hn_firing = 0;
     lander.thrust.vp_stage = 0;
     lander.thrust.vp_firing = 0;
+    lander.crashed = false;
+    lander.landed = false;
+    lander.perched = false;
 
     generate_moon();
     init_lock(evt_lock);
@@ -443,7 +633,7 @@ void timer_callback(void)
     } else {
         ticks++;
 
-        if (ticks%8 == 0) {
+        if (ticks%16 == 0) {
             add_event(SIGNAL_GO);
         }
     }
@@ -559,7 +749,7 @@ void draw_moon(void)
 {
     unsigned int i;
     for (i = 0; i < SCREEN_WIDTH; i++) {
-        draw_vertical(i, SCREEN_HEIGHT-moon[i+camera]);
+        draw_vertical(i, moon[i+camera]);
     }
 }
 
