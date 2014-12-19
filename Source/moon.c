@@ -1,6 +1,4 @@
 #include "lander.h"
-#include "lock.h"
-#include "main.h"
 #include "ti86.h"
 #include "moon.h"
 
@@ -88,16 +86,4 @@ void draw_moon(void)
     for (i = 0; i < SCREEN_WIDTH; i++) {
         draw_vertical(i, moon[i+camera]);
     }
-}
-
-void world_redraw(void)
-{
-    wait_lock(lcd);
-    clear_buffer();
-    draw_moon();
-    clear_screen();
-    screencopy();
-    draw_lander();
-    frames++;
-    drop_lock(lcd);
 }
