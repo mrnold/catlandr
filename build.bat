@@ -6,6 +6,13 @@
 @set COMPILE=@call :compile
 @set SDCCBASE=sdcc -mz80 --no-std-crt0 --reserve-regs-iy -ISource
 
+%COMPILE% Source\bitmap.c
+%COMPILE% Source\event.c
+%COMPILE% Source\lander.c
+%COMPILE% Source\lock.c
+%COMPILE% Source\misc.c
+%COMPILE% Source\moon.c
+%COMPILE% Source\physics.c
 %COMPILE% Source\ti86.c
 %BUILD%   Source\main.c
 @rem SDCC generates main.ihx instead of main.c.ihx?

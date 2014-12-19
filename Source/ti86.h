@@ -1,3 +1,6 @@
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+
 struct keyrow_0 {
     unsigned char K_F5   : 1;
     unsigned char K_F4   : 1;
@@ -29,3 +32,4 @@ unsigned short random16(void);
 void scan_row_6(struct keyrow_6 *);
 void scan_row_0(struct keyrow_0 *);
 void screencopy(void) __naked;
+void draw_vertical(unsigned short, unsigned char);

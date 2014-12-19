@@ -17,3 +17,6 @@
 #define is_locked(x) ((lock_t)x & 0x01)
 
 typedef unsigned char lock_t;
+
+extern lock_t main_lock;
+extern lock_t lcd;
