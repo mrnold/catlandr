@@ -38,4 +38,5 @@ unsigned short random16(void);
 void scan_row_6(union keyrow_6 *);
 void scan_row_0(union keyrow_0 *);
 void screencopy(void) __naked;
-void draw_vertical(unsigned short, unsigned char);
+void prerender(void);
+void draw_moon(void) __naked;

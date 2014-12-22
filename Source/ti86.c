@@ -1,10 +1,13 @@
+#include "moon.h"
+#include "physics.h"
 #include "ti86.h"
 
 static unsigned char r8;
 static unsigned short r16;
 static void (*callback_function)(void);
 
-unsigned char screenbuffer[1024];
+__at (0x8100) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
+__at (0xb000) unsigned char screenbuffer[SCREEN_HEIGHT][SCREEN_WIDTH/8];
 
 void putchar(char c) __naked
 {
@@ -146,11 +149,10 @@ unsigned short random16(void)
 }
 
 __sfr __at 0x01 keyport;
-void scan_row_6(struct keyrow_6 *k6)
+void scan_row_6(union keyrow_6 *k6)
 {
-    unsigned char *cast = (unsigned char *)k6;
     keyport = 0xfe;
-    *cast = ~keyport;
+    k6->raw = ~keyport;
 }
 void scan_row_0(union keyrow_0 *k0)
 {
@@ -175,6 +177,142 @@ void screencopy(void) __naked
     __endasm;
 }
 
+void prerender(void)
+{
+    unsigned int j;
+    unsigned char i;
+    unsigned char height;
+
+    /*for (j = 0; j < MOON_WIDTH-1; j++) {
+        offset = j/8+moon[j+camera]*(MOON_WIDTH-1);
+        for (i = screen+offset; i < screen+8192; i += MOON_WIDTH-1) {
+            *i |= (0x80 >> (j%8));
+        } // Draw ground pixels to height
+        for (i = screen+j/8; i < offset; i += MOON_WIDTH-1) {
+            *i &= (0xfe << (8-j%8));
+        } // Clear pixels above ground
+    }*/
+    /*for (j = 0; j < (MOON_WIDTH-1)/8; j++) {
+        for (i = 0; i < SCREEN_HEIGHT; i++) {
+            prerendered[i][j] = 0;
+        }
+    }*/
+    for (j = 0; j < (MOON_WIDTH-1); j++) {
+        height = moon[j];
+        for (i = 0; i < height; i++) {
+            prerendered[i][j/8] &= (0xfe << (8-j%8));
+        }
+        for (; i < SCREEN_HEIGHT; i++) {
+            prerendered[i][j/8] |= (0x80 >> (j%8));
+        }
+    }
+}
+
+
+static unsigned char fdm_shift1;
+void draw_moon(void) __naked
+{
+    __asm
+        push bc ;// scr
+        push de ;// pre
+        push hl ;// temps
+        push af ;// math
+
+        ld hl, #_camera
+
+        ld a, #0x07
+        and a, (hl)
+        ld (#_fdm_shift1), a ;// Save the left shift
+
+        ld e, (hl)
+        inc hl
+        ld d, (hl)
+        srl d
+        rr e
+        srl d
+        rr e
+        srl d
+        rr e ;// camera/8 in de
+
+        ld hl, #_prerendered
+        add hl, de
+        ex de, hl ;// de = prerendered+prex
+
+        ld bc, #_screenbuffer ;// bc now scr
+
+    fdm_loop: ;// Want (bc) = (de)
+
+        ld a, (de) ;// Put (de) into hl so we can shift with add hl, hl
+        ld h, a ;// No little-endian business! The bytes are already in order!
+        inc de
+        ld a, (de)
+        ld l, a
+
+        ld a, (#_fdm_shift1)
+        and a ;// Set z or nz, handle 0 right off the bat
+        jp z, fdm_loop_shift0
+        dec a
+        jp z, fdm_loop_shift1
+        dec a
+        jp z, fdm_loop_shift2
+        dec a
+        jp z, fdm_loop_shift3
+        dec a
+        jp z, fdm_loop_shift4
+        dec a
+        jp z, fdm_loop_shift5
+        dec a
+        jp z, fdm_loop_shift6
+        dec a
+        jp z, fdm_loop_shift7
+        jp fdm_loop_done
+    fdm_loop_shift7:
+        add hl, hl
+    fdm_loop_shift6:
+        add hl, hl
+    fdm_loop_shift5:
+        add hl, hl
+    fdm_loop_shift4:
+        add hl, hl
+    fdm_loop_shift3:
+        add hl, hl
+    fdm_loop_shift2:
+        add hl, hl
+    fdm_loop_shift1:
+        add hl, hl
+    fdm_loop_shift0:
+    fdm_loop_shiftdone:
+        ld a, h
+        ld (bc), a
+
+        ;// inc de Aldready taken care of
+        inc bc
+        bit 2, b ;// bc (scr) = screenbuf+1024? Must be aligned with _at!!!
+        jp nz, fdm_loop_done
+        ld a, #0x0f
+        and c ;// multiples of 16: de (pre) needs to make a big jump to next row. use _at!
+        jp nz, fdm_loop
+        ld a, e
+        add a, #0x70 ;// 128 to next row, (later) minus 16 for the loop incs
+        ld e, a
+        ld a, #0x00
+        adc a, d
+        ld d, a
+        jp fdm_loop
+    fdm_loop_done:
+
+        pop af
+        pop hl
+        pop de
+        pop bc
+
+        ret
+    __endasm;
+}
+
+/*
+ * The draw_moon graveyard. Things I tried that were not fast enough.
+
 void draw_vertical(unsigned short x, unsigned char height)
 {
     unsigned char *i;
@@ -185,3 +323,69 @@ void draw_vertical(unsigned short x, unsigned char height)
         *i |= (0x80 >> (x%8));
     }
 }
+
+void draw_moon(void)
+{
+    unsigned int i;
+    for (i = 0; i < SCREEN_WIDTH; i++) {
+        draw_vertical(i, moon[i+camera]);
+    }
+}
+
+void draw_moon(void)
+{
+    for (x = 0; x < SCREEN_WIDTH/8; x++) {
+        for (y = 0; y < SCREEN_HEIGHT; y++) {
+            screenbuffer[y][x]  = prerendered[y][prex] << shift1;
+            screenbuffer[y][x] |= prerendered[y][prex+1] >> shift2;
+        }
+        prex++;
+    }
+}
+
+void draw_moon(void)
+{
+    unsigned int prex = camera/8;
+    unsigned int shift1 = camera%8;
+    unsigned int shift2 = 8-shift1;
+
+    unsigned char *scr = (unsigned char *)screenbuffer;
+    unsigned char *pre = (unsigned char *)prerendered + prex;
+    while (scr < ((unsigned char *)screenbuffer)+1024) {
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        *(scr)  = *(pre) << shift1; pre++;
+        *(scr) |= *(pre) >> shift2; scr++;
+        pre += (MOON_WIDTH-1)/8-16;
+    }
+}
+
+*/
