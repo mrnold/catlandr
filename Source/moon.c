@@ -1,5 +1,4 @@
 #include "lander.h"
-#include "physics.h"
 #include "ti86.h"
 #include "moon.h"
 
@@ -79,12 +78,6 @@ void generate_moon(void)
     for (i = 0; i < MOON_WIDTH; i++) {
         moon[i] = SCREEN_HEIGHT-moon[i];
     }
-}
 
-void draw_moon(void)
-{
-    unsigned int i;
-    for (i = 0; i < SCREEN_WIDTH; i++) {
-        draw_vertical(i, moon[i+camera]);
-    }
+    prerender();
 }

@@ -4,7 +4,8 @@
 @set LINKS=Build\ti86_crt0.rel
 @set BUILD=@call :build
 @set COMPILE=@call :compile
-@set SDCCBASE=sdcc -mz80 --no-std-crt0 --reserve-regs-iy -ISource
+@set FAKE=@call :fake
+@set SDCCBASE=sdcc -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed -ISource
 
 %COMPILE% Source\bitmap.c
 %COMPILE% Source\event.c
@@ -26,6 +27,10 @@ python Tools\binpac8x.py -6 -O LUNALNDR Build\Source\main.bin
 @mkdir Build\%1 > NUL 2>&1
 @rmdir Build\%1 > NUL 2>&1
 %SDCCBASE% -c %1 -o Build\%1.rel
+@set LINKS=%LINKS% Build\%1.rel
+@goto :done
+
+:fake
 @set LINKS=%LINKS% Build\%1.rel
 @goto :done
 

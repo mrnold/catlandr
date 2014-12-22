@@ -51,9 +51,7 @@ void gamesequence(void)
     apply_input();
     physics();
     collisions();
-    clear_buffer();
     draw_moon();
-    clear_screen();
     screencopy();
     draw_lander();
 }
@@ -76,15 +74,14 @@ void init(void)
 
 void timer_callback(void)
 {
-    if (is_locked(main_lock)) {
-        dropped++;
-    } else {
-        ticks++;
-
-        if (ticks%16 == 0) {
+    if (ticks%8 == 0) {
+        if (is_locked(main_lock)) {
+            dropped++;
+        } else {
             add_event(SIGNAL_GO);
         }
     }
+    ticks++;
 }
 
 void perfcheck(void)
