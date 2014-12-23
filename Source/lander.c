@@ -65,8 +65,7 @@ void draw_lander(void)
         screenbyte = screen+start;
         shift = x%8;
         for (i = 0; i < LANDER_HEIGHT; i++) {
-            imgbyte = img_thrustleft[i][lander.thrust.hn_stage];
-            imgbyte = reverse(imgbyte);
+            imgbyte = img_thrustright[i][lander.thrust.hn_stage];
             if (x < SCREEN_WIDTH) {
                 *screenbyte |= (imgbyte >> shift);
             }
