@@ -209,10 +209,10 @@ void prerender(void)
 }
 
 
-static unsigned char fdm_shift1;
 void draw_moon(void) __naked
 {
     __asm
+        push iy ;// shift amount
         push bc ;// scr
         push de ;// pre
         push hl ;// temps
@@ -222,8 +222,49 @@ void draw_moon(void) __naked
 
         ld a, #0x07
         and a, (hl)
-        ld (#_fdm_shift1), a ;// Save the left shift
+        jp z, fdm_setup_loop_shift0
+        dec a
+        jp z, fdm_setup_loop_shift1
+        dec a
+        jp z, fdm_setup_loop_shift2
+        dec a
+        jp z, fdm_setup_loop_shift3
+        dec a
+        jp z, fdm_setup_loop_shift4
+        dec a
+        jp z, fdm_setup_loop_shift5
+        dec a
+        jp z, fdm_setup_loop_shift6
+        dec a
+        jp z, fdm_setup_loop_shift7
+        jp fdm_setup_loop_done
+    fdm_setup_loop_shift7:
+        ld iy, #fdm_loop_shift7
+        jp fdm_setup_loop_done
+    fdm_setup_loop_shift6:
+        ld iy, #fdm_loop_shift6
+        jp fdm_setup_loop_done
+    fdm_setup_loop_shift5:
+        ld iy, #fdm_loop_shift5
+        jp fdm_setup_loop_done
+    fdm_setup_loop_shift4:
+        ld iy, #fdm_loop_shift4
+        jp fdm_setup_loop_done
+    fdm_setup_loop_shift3:
+        ld iy, #fdm_loop_shift3
+        jp fdm_setup_loop_done
+    fdm_setup_loop_shift2:
+        ld iy, #fdm_loop_shift2
+        jp fdm_setup_loop_done
+    fdm_setup_loop_shift1:
+        ld iy, #fdm_loop_shift1
+        jp fdm_setup_loop_done
+    fdm_setup_loop_shift0:
+        ld iy, #fdm_loop_shift0
+        ;jp fdm_setup_loop_done
+    fdm_setup_loop_done:
 
+        ld hl, #_camera
         ld e, (hl)
         inc hl
         ld d, (hl)
@@ -247,25 +288,8 @@ void draw_moon(void) __naked
         inc de
         ld a, (de)
         ld l, a
+        jp (iy)
 
-        ld a, (#_fdm_shift1)
-        and a ;// Set z or nz, handle 0 right off the bat
-        jp z, fdm_loop_shift0
-        dec a
-        jp z, fdm_loop_shift1
-        dec a
-        jp z, fdm_loop_shift2
-        dec a
-        jp z, fdm_loop_shift3
-        dec a
-        jp z, fdm_loop_shift4
-        dec a
-        jp z, fdm_loop_shift5
-        dec a
-        jp z, fdm_loop_shift6
-        dec a
-        jp z, fdm_loop_shift7
-        jp fdm_loop_done
     fdm_loop_shift7:
         add hl, hl
     fdm_loop_shift6:
@@ -305,6 +329,7 @@ void draw_moon(void) __naked
         pop hl
         pop de
         pop bc
+        pop iy
 
         ret
     __endasm;
