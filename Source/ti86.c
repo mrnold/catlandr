@@ -183,26 +183,25 @@ void prerender(void)
     unsigned char i;
     unsigned char height;
 
-    /*for (j = 0; j < MOON_WIDTH-1; j++) {
-        offset = j/8+moon[j+camera]*(MOON_WIDTH-1);
-        for (i = screen+offset; i < screen+8192; i += MOON_WIDTH-1) {
-            *i |= (0x80 >> (j%8));
-        } // Draw ground pixels to height
-        for (i = screen+j/8; i < offset; i += MOON_WIDTH-1) {
-            *i &= (0xfe << (8-j%8));
-        } // Clear pixels above ground
-    }*/
-    /*for (j = 0; j < (MOON_WIDTH-1)/8; j++) {
-        for (i = 0; i < SCREEN_HEIGHT; i++) {
-            prerendered[i][j] = 0;
-        }
-    }*/
+    __asm
+        push hl
+        push de
+        push bc
+
+        ld hl, #_prerendered
+        ld (hl), #0
+        ld de, #_prerendered+1
+        ld bc, #8191
+        ldir
+
+        pop bc
+        pop de
+        pop hl
+    __endasm;
+
     for (j = 0; j < (MOON_WIDTH-1); j++) {
         height = moon[j];
-        for (i = 0; i < height; i++) {
-            prerendered[i][j/8] &= (0xfe << (8-j%8));
-        }
-        for (; i < SCREEN_HEIGHT; i++) {
+        for (i = height; i < SCREEN_HEIGHT; i++) {
             prerendered[i][j/8] |= (0x80 >> (j%8));
         }
     }
