@@ -289,23 +289,31 @@ void draw_moon(void) __naked
         ld l, a
         jp (iy)
 
-    fdm_loop_shift7:
+    fdm_loop_shift7: ;// 30 beats 77
+        srl h
+        rr l
+        ld a, l
+        jp fdm_loop_shiftdone
+    fdm_loop_shift6: ;// 46 beats 66
+        srl h
+        rr l
+        srl h
+        rr l
+        ld a, l
+        jp fdm_loop_shiftdone
+    fdm_loop_shift5: ;// 55+4
         add hl, hl
-    fdm_loop_shift6:
+    fdm_loop_shift4: ;// 44+4
         add hl, hl
-    fdm_loop_shift5:
+    fdm_loop_shift3: ;// 33+4
         add hl, hl
-    fdm_loop_shift4:
+    fdm_loop_shift2: ;// 22+4
         add hl, hl
-    fdm_loop_shift3:
-        add hl, hl
-    fdm_loop_shift2:
-        add hl, hl
-    fdm_loop_shift1:
+    fdm_loop_shift1: ;// 11+4
         add hl, hl
     fdm_loop_shift0:
-    fdm_loop_shiftdone:
         ld a, h
+    fdm_loop_shiftdone:
         ld (bc), a
 
         ;// inc de Aldready taken care of
