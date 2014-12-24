@@ -289,20 +289,27 @@ void draw_moon(void) __naked
         ld l, a
         jp (iy)
 
-    fdm_loop_shift7: ;// 30 beats 77
+    fdm_loop_shift7: ;// 22 beats 77
+        ;// ld a, l
         srl h
-        rr l
-        ld a, l
+        rra
         jp fdm_loop_shiftdone
-    fdm_loop_shift6: ;// 46 beats 66
+    fdm_loop_shift6: ;// 32 beats 66
+        ;// ld a, l
         srl h
-        rr l
+        rra
         srl h
-        rr l
-        ld a, l
+        rra
         jp fdm_loop_shiftdone
-    fdm_loop_shift5: ;// 55+4
-        add hl, hl
+    fdm_loop_shift5: ;// 46 beats 55+4
+        ;// ld a, l
+        srl h
+        rra
+        srl h
+        rra
+        srl h
+        rra
+        jp fdm_loop_shiftdone
     fdm_loop_shift4: ;// 44+4
         add hl, hl
     fdm_loop_shift3: ;// 33+4
