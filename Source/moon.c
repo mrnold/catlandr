@@ -77,8 +77,8 @@ void generate_moon(void)
             if (distortion < 20) {
                 distortion = 20;
             }
-            if (distortion > SCREEN_HEIGHT-2) {
-                distortion = SCREEN_HEIGHT-2;
+            if (distortion > SCREEN_HEIGHT-LANDER_HEIGHT) {
+                distortion = SCREEN_HEIGHT-LANDER_HEIGHT;
             }
             moon[j] = (unsigned char)distortion;
         }
