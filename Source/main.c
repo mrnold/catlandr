@@ -1,5 +1,4 @@
 #include "bitmap.h"
-#include "event.h"
 #include "lander.h"
 #include "lock.h"
 #include "misc.h"
@@ -17,33 +16,33 @@ void perfcheck(void);
 void gamesequence(void);
 void timer_callback(void);
 
-lock_t main_lock;
+lock_t frame_lock;
+lock_t idle_lock;
 
 int main(void)
 {
     init();
     while (running) {
-        event_t e;
-
-        wait_lock(main_lock);
-        do {
-            e = get_event();
-            if (e == SIGNAL_GO) {
-                gamesequence();
-                frames++;
-            } else if (e == QUIT) {
-                running = false;
-            }
-        } while (e != NONE);
-        drop_lock(main_lock);
+        wait_lock(idle_lock);
+        wait_lock(frame_lock);
+        gamesequence();
+        frames++;
+        drop_lock(frame_lock);
 
         if (running) {
             perfcheck();
-            idle();
+            while (is_locked(idle_lock)) {
+                idle();
+            }
         }
     }
 
     return 0;
+}
+
+void force_call(void)
+{
+    moon;
 }
 
 void gamesequence(void)
@@ -54,6 +53,7 @@ void gamesequence(void)
     draw_moon();
     screencopy();
     draw_lander();
+    force_call();
 }
 
 void init(void)
@@ -63,23 +63,22 @@ void init(void)
     dropped = 0;
     running = true;
 
-    init_event();
     init_lander();
     init_moon();
     init_physics();
 
-    init_lock(main_lock);
+    init_lock(idle_lock);
+    init_lock(frame_lock);
     setup_timer(&timer_callback);
 }
 
 void timer_callback(void)
 {
     if (ticks%8 == 0) {
-        if (is_locked(main_lock)) {
+        if (is_locked(frame_lock)) {
             dropped++;
-        } else {
-            add_event(SIGNAL_GO);
         }
+        drop_lock(idle_lock);
     }
     ticks++;
 }
