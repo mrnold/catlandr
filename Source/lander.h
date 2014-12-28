@@ -10,7 +10,7 @@ struct lander_t {
     } previous;
     struct {
         char x, y;
-    } momentum;
+    } speed;
     struct {
         char x, y;
     } acceleration;
