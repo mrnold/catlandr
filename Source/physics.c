@@ -1,5 +1,4 @@
 #include "bitmap.h"
-#include "event.h"
 #include "lander.h"
 #include "misc.h"
 #include "moon.h"
@@ -8,6 +7,7 @@
 
 unsigned int camera;
 unsigned int previouscamera;
+extern unsigned char running;
 
 void init_physics(void)
 {
@@ -290,6 +290,6 @@ void apply_input(void)
     }
     
     if (k0.keys.K_EXIT) {
-        add_event(QUIT);
+        running = false;
     }
 }
