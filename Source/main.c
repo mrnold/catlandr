@@ -1,6 +1,7 @@
 #include "bitmap.h"
 #include "lander.h"
 #include "lock.h"
+#include "kitty.h"
 #include "misc.h"
 #include "moon.h"
 #include "physics.h"
@@ -27,6 +28,7 @@ int main(void)
         wait_lock(frame_lock);
         gamesequence();
         frames++;
+        t++; // This should be done after all physics calls are finished
         drop_lock(frame_lock);
 
         if (running) {
@@ -50,8 +52,10 @@ void gamesequence(void)
     apply_input();
     physics();
     collisions();
+    move_kitty();
     draw_moon();
     draw_lander();
+    draw_kitty();
     screencopy();
     force_call();
 }
@@ -63,6 +67,7 @@ void init(void)
     dropped = 0;
     running = true;
 
+    init_kitty();
     init_lander();
     init_moon();
     init_physics();
