@@ -229,8 +229,6 @@ void collisions(void)
             lander.speed.y = 0;
         }
     }
-
-    t++; // This should be done after all physics calls are finished
 }
 
 void apply_input(void)

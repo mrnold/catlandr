@@ -4,6 +4,7 @@ void collisions(void);
 void physics(void);
 
 extern unsigned int camera;
+extern unsigned int t;
 
 #define GRAVITY 2
 #define ACCEL_MAX 10
