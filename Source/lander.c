@@ -1,6 +1,7 @@
 #include "bitmap.h"
 #include "lander.h"
 #include "misc.h"
+#include "moon.h"
 #include "physics.h"
 #include "ti86.h"
 
@@ -30,7 +31,6 @@ void draw_lander(void)
 {
     const unsigned int yoffset = lander.y*16;
     const unsigned char landerx = (unsigned char)(lander.x-camera);
-    unsigned char * const screen = (unsigned char *)0xfc00;
 
     unsigned char i, y, x, rshift, lshift, imgbyte, *screenbyte;
     unsigned int start;
@@ -38,7 +38,7 @@ void draw_lander(void)
     rshift = landerx%8;
     lshift = 8-rshift;
     start = landerx/8+yoffset;
-    screenbyte = screen+start;
+    screenbyte = (unsigned char *)screenbuffer+start;
     for (i = 0; i < LANDER_HEIGHT; i++) {
         *screenbyte |= (lander.bitmap[i] >> rshift);
         *(screenbyte+1) |= (lander.bitmap[i] << lshift);
@@ -50,7 +50,7 @@ void draw_lander(void)
         rshift = x%8;
         lshift = 8-rshift;
         start = x/8+yoffset;
-        screenbyte = screen+start;
+        screenbyte = (unsigned char *)screenbuffer+start;
         if (landerx >= LANDER_WIDTH) {
             for (i = 0; i < LANDER_HEIGHT; i++) {
                 imgbyte = img_thrustleft[i][lander.thrust.hp_stage];
@@ -72,7 +72,7 @@ void draw_lander(void)
         rshift = x%8;
         lshift = 8-rshift;
         start = x/8+yoffset;
-        screenbyte = screen+start;
+        screenbyte = (unsigned char *)screenbuffer+start;
         if (x < SCREEN_WIDTH-LANDER_WIDTH) {
             for (i = 0; i < LANDER_HEIGHT; i++) {
                 imgbyte = img_thrustright[i][lander.thrust.hn_stage];
@@ -93,7 +93,7 @@ void draw_lander(void)
         y = lander.y+LANDER_HEIGHT;
         rshift = landerx%8;
         start = landerx/8+y*16;
-        screenbyte = screen+start;
+        screenbyte = (unsigned char *)screenbuffer+start;
         for (i = 0; i < LANDER_HEIGHT; i++) {
             imgbyte = img_thrustdown[i][lander.thrust.vp_stage];
             *screenbyte ^= (imgbyte >> rshift);

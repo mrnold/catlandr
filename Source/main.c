@@ -51,8 +51,8 @@ void gamesequence(void)
     physics();
     collisions();
     draw_moon();
-    screencopy();
     draw_lander();
+    screencopy();
     force_call();
 }
 
