@@ -13,6 +13,10 @@ struct kitty_t {
     unsigned char (*bitmap)[8][CAT_RUNSTAGES];
     unsigned char state;
     unsigned char stage;
+    struct {
+        char x;
+        char y;
+    } speed;
 };
 
 void draw_kitty(void);
