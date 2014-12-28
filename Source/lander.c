@@ -11,10 +11,10 @@ void init_lander(void)
 {
     lander.y = 0;
     lander.x = SCREEN_WIDTH/2;
-    lander.momentum.x = 0;
-    lander.momentum.y = 0;
+    lander.speed.x = 0;
+    lander.speed.y = 0;
     lander.acceleration.x = 0;
-    lander.acceleration.y = 1;
+    lander.acceleration.y = GRAVITY;
     lander.bitmap = img_lander;
     lander.thrust.hp_stage = 0;
     lander.thrust.hp_firing = 0;
