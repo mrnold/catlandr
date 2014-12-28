@@ -68,19 +68,40 @@ void move_kitty(void)
     unsigned int i;
     unsigned char max = SCREEN_HEIGHT;
 
-    if (kitty.speed.y == 0) { // Not jumping
-        for (i = kitty.x; i < kitty.x+KITTY_WIDTH; i++) {
-            if (moon[i] < max) {
-                max = moon[i];
-            }
+    for (i = kitty.x; i < kitty.x+KITTY_WIDTH; i++) {
+        if (moon[i] < max) { // Find highest peak under cat's feet
+            max = moon[i];
         }
-        kitty.y = max-KITTY_HEIGHT;
+    }
+
+    scratch = kitty.y + kitty.speed.y;
+    if (kitty.speed.y < 0) { // Jumping
+        if (scratch < 0) {
+            scratch = 0;
+        }
+        if (max < scratch) { // Landed on a hill
+            kitty.y = max-KITTY_HEIGHT;
+            kitty.speed.y = 0;
+        } else {
+            kitty.y = scratch;
+        }
+    } else if (kitty.speed.y >= 0) {
+        if (kitty.y > max-KITTY_HEIGHT) {
+            kitty.y = max-KITTY_HEIGHT;
+            kitty.speed.y = 0;
+        } else {
+            kitty.y = scratch;
+        }
+    }
+
+    if (kitty.y < max-KITTY_HEIGHT) {
+        kitty.speed.y++; // Gravity
     }
 
     if (lander.x > kitty.x) {
-        kitty.speed.x = 5;
+        kitty.speed.x = 4;
     } else if (lander.x < kitty.x) {
-        kitty.speed.x = -5;
+        kitty.speed.x = -4;
     } else {
         kitty.speed.x = 0;
     }
@@ -92,25 +113,39 @@ void move_kitty(void)
     } else if (scratch > MOON_WIDTH-KITTY_WIDTH) {
         kitty.x = MOON_WIDTH-KITTY_WIDTH;
         kitty.speed.x = 0;
-    } else if (scratch > lander.x && kitty.speed.x > 0) {
-        kitty.x = lander.x;
-        kitty.speed.x = 0;
-    } else if (scratch < lander.x+KITTY_WIDTH && kitty.speed.x < 0) {
-        kitty.x = lander.x;
-        kitty.speed.x = 0;
     } else {
         kitty.x = scratch;
     }
 
-    if (kitty.speed.x > 0) {
-        kitty.bitmap = &cat_runright;
-        kitty.state = RUNNING_RIGHT;
+    if (kitty.speed.x > 0) { // Jump range
+        if (scratch > lander.x) {
+            kitty.x = lander.x;
+            kitty.speed.x = 0;
+        } else if (scratch > lander.x-3*KITTY_WIDTH) {
+            kitty.speed.y = -3;
+        }
     } else if (kitty.speed.x < 0) {
-        kitty.bitmap = &cat_runleft;
-        kitty.state = RUNNING_LEFT;
+        if (scratch < lander.x+KITTY_WIDTH) {
+            kitty.x = lander.x;
+            kitty.speed.x = 0;
+        } else if (scratch < lander.x+3*KITTY_WIDTH) {
+            kitty.speed.y = -3;
+        }
+    }
+
+    if (kitty.speed.y < 0) {
+        kitty.state = JUMPING;
     } else {
-        kitty.bitmap = &cat_sitting;
-        kitty.state = SITTING;
+        if (kitty.speed.x > 0) {
+            kitty.bitmap = &cat_runright;
+            kitty.state = RUNNING_RIGHT;
+        } else if (kitty.speed.x < 0) {
+            kitty.bitmap = &cat_runleft;
+            kitty.state = RUNNING_LEFT;
+        } else {
+            kitty.bitmap = &cat_sitting;
+            kitty.state = SITTING;
+        }
     }
 
     if (t%8 == 0) {
