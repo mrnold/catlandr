@@ -1,6 +1,6 @@
 #include "lander.h"
-#include "ti86.h"
 #include "moon.h"
+#include "ti86.h"
 
 unsigned short landingpad;
 __at (MOON_SAFERAM) unsigned char moon[MOON_WIDTH];
