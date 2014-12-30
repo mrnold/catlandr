@@ -15,6 +15,7 @@ struct kitty_t {
     unsigned char (*bitmap)[8][CAT_RUNSTAGES];
     unsigned char state;
     unsigned char stage;
+    unsigned char batting;
     struct {
         char x;
         char y;
