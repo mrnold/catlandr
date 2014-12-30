@@ -41,7 +41,7 @@ void move_lander(void)
     if (kitty.x+KITTY_WIDTH >= lander.x && kitty.x <= lander.x+LANDER_WIDTH) {
         if (kitty.y >= lander.y && kitty.y <= lander.y+LANDER_HEIGHT) { // Hit!
             if (kitty.speed.x == 0 && kitty.speed.y == 0) {
-                lander.speed.y = -6; // Sitting cat, bat lander upwards
+                lander.speed.y = -SPEED_MAX; // Bat lander upwards
             } else {
                 lander.speed.x += kitty.speed.x;
                 lander.speed.y += kitty.speed.y;
