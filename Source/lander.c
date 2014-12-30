@@ -25,7 +25,6 @@ void init_lander(void)
     lander.thrust.vp_firing = 0;
     lander.crashed = false;
     lander.landed = false;
-    lander.perched = false;
     lander.fuel = 127;
     lander.food = 31;
     lander.air = 255;
@@ -41,6 +40,10 @@ void move_lander(void)
     lander.previous.x = lander.x;
     lander.previous.y = lander.y;
     previouscamera = camera;
+
+    if (lander.crashed) {
+        return;
+    }
 
     if (kitty.x+KITTY_WIDTH >= lander.x && kitty.x <= lander.x+LANDER_WIDTH) {
         if (kitty.y >= lander.y && kitty.y <= lander.y+LANDER_HEIGHT) { // Hit!
@@ -135,10 +138,6 @@ void move_lander(void)
         } else {
             lander.y = scratch;
         }
-    }
-
-    if (lander.speed.y < 0) {
-        lander.perched = false;
     }
 }
 

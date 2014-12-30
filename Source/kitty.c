@@ -98,7 +98,11 @@ void move_kitty(void)
         } else if (kitty.x > scratch) {
             nextstate = RUNNING_LEFT;
         } else if (scratch > kitty.x) {
-            nextstate = JUMPING_LEFT;
+            if (lander.crashed || lander.landed) {
+                nextstate = SITTING;
+            } else {
+                nextstate = JUMPING_LEFT;
+            }
         }
     } else if (kitty.state == RUNNING_RIGHT) {
         scratch = lander.x-3*KITTY_WIDTH;
@@ -109,7 +113,11 @@ void move_kitty(void)
         } else if (kitty.x < scratch) {
             nextstate = RUNNING_RIGHT;
         } else if (scratch < kitty.x) {
-            nextstate = JUMPING_RIGHT;
+            if (lander.crashed || lander.landed) {
+                nextstate = SITTING;
+            } else {
+                nextstate = JUMPING_RIGHT;
+            }
         }
     } else if (kitty.state == JUMPING_LEFT) {
         if (kitty.y >= max-KITTY_HEIGHT) {
