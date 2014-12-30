@@ -26,6 +26,9 @@ struct lander_t {
     unsigned char landed;
     unsigned char perched;
     unsigned char *bitmap;
+    unsigned char fuel;
+    unsigned char food;
+    unsigned char air;
 };
 
 void draw_lander(void);

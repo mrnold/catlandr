@@ -136,12 +136,10 @@ void apply_input(void)
     union keyrow_6 k6;
     union keyrow_0 k0;
 
-    if (!lander.crashed && !lander.landed) {
+    if (!lander.crashed && !lander.landed && lander.fuel > 0) {
         scan_row_6(&k6);
     } else {
-        k6.keys.K_RIGHT = false;
-        k6.keys.K_LEFT = false;
-        k6.keys.K_UP = false;
+        k6.raw = 0;
     }
     scan_row_0(&k0);
 
@@ -152,6 +150,9 @@ void apply_input(void)
         lander.thrust.hp_firing = true;
         if (t%4 == 0) { // Cycle ~6 times/sec
             lander.thrust.hp_stage++;
+            if (lander.fuel != 0) {
+                lander.fuel--;
+            }
         }
     } else {
         lander.thrust.hp_firing = false;
@@ -164,6 +165,9 @@ void apply_input(void)
         lander.thrust.hn_firing = true;
         if (t%4 == 0) {
             lander.thrust.hn_stage++;
+            if (lander.fuel != 0) {
+                lander.fuel--;
+            }
         }
     } else {
         lander.thrust.hn_firing = false;
@@ -184,6 +188,9 @@ void apply_input(void)
         lander.thrust.vp_firing = true;
         if (t%4 == 0) {
             lander.thrust.vp_stage++;
+            if (lander.fuel != 0) {
+                lander.fuel--;
+            }
         }
     } else {
         if (!lander.crashed && !lander.perched) {
@@ -192,7 +199,7 @@ void apply_input(void)
         lander.thrust.vp_firing = false;
         lander.thrust.vp_stage = 0;
     }
-    
+
     if (k0.keys.K_EXIT) {
         running = false;
     }

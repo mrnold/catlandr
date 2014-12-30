@@ -67,6 +67,8 @@ void init(void)
     dropped = 0;
     running = true;
 
+    clear_screen();
+
     init_kitty();
     init_lander();
     init_moon();
