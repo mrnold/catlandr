@@ -51,7 +51,7 @@ void gamesequence(void)
 {
     apply_input();
     move_kitty();
-    physics();
+    move_lander();
     collisions();
     draw_moon();
     draw_lander();
