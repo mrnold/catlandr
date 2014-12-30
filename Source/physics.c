@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "kitty.h"
 #include "lander.h"
 #include "misc.h"
 #include "moon.h"
@@ -26,6 +27,17 @@ void physics(void)
     lander.previous.x = lander.x;
     lander.previous.y = lander.y;
     previouscamera = camera;
+
+    if (kitty.x+KITTY_WIDTH >= lander.x && kitty.x <= lander.x+LANDER_WIDTH) {
+        if (kitty.y >= lander.y && kitty.y <= lander.y+LANDER_HEIGHT) { // Hit!
+            if (kitty.speed.x == 0 && kitty.speed.y == 0) {
+                lander.speed.y = -6; // Sitting cat, bat lander upwards
+            } else {
+                lander.speed.x += kitty.speed.x;
+                lander.speed.y += kitty.speed.y;
+            }
+        }
+    }
 
     lander.speed.x += lander.acceleration.x/2;
     if (lander.speed.x > 0) {
