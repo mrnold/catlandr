@@ -50,9 +50,9 @@ void force_call(void)
 void gamesequence(void)
 {
     apply_input();
+    move_kitty();
     physics();
     collisions();
-    move_kitty();
     draw_moon();
     draw_lander();
     draw_kitty();
