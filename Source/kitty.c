@@ -67,46 +67,92 @@ void move_kitty(void)
     int scratch;
     unsigned int i;
     unsigned char max = SCREEN_HEIGHT;
+    unsigned char nextstate = SITTING;
 
+    // Find highest peak under cat's feet so it can run along the surface
     for (i = kitty.x; i < kitty.x+KITTY_WIDTH; i++) {
-        if (moon[i] < max) { // Find highest peak under cat's feet
+        if (moon[i] < max) {
             max = moon[i];
         }
     }
 
-    scratch = kitty.y + kitty.speed.y;
-    if (kitty.speed.y < 0) { // Jumping
-        if (scratch < 0) {
-            scratch = 0;
-        }
-        if (max < scratch) { // Landed on a hill
-            kitty.y = max-KITTY_HEIGHT;
-            kitty.speed.y = 0;
+    // Cat state machine
+    if (kitty.state == SITTING) { // Initial state
+        if (lander.x == kitty.x) { // State transitions
+            nextstate = SITTING;
+        } else if (lander.x+LANDER_WIDTH < kitty.x) {
+            nextstate = RUNNING_LEFT;
+        } else if (lander.x > kitty.x+KITTY_WIDTH) {
+            nextstate = RUNNING_RIGHT;
         } else {
-            kitty.y = scratch;
+            nextstate = SITTING;
         }
-    } else if (kitty.speed.y >= 0) {
-        if (kitty.y > max-KITTY_HEIGHT) {
-            kitty.y = max-KITTY_HEIGHT;
-            kitty.speed.y = 0;
+    } else if (kitty.state == RUNNING_LEFT) {
+        scratch = lander.x+LANDER_WIDTH+3*KITTY_WIDTH;
+        if (lander.x == kitty.x || kitty.speed.x == 0) {
+            nextstate = SITTING;
+        } else if (lander.x > kitty.x) {
+            nextstate = RUNNING_RIGHT;
+        } else if (kitty.x > scratch) {
+            nextstate = RUNNING_LEFT;
+        } else if (scratch > kitty.x) {
+            nextstate = JUMPING_LEFT;
+        }
+    } else if (kitty.state == RUNNING_RIGHT) {
+        scratch = lander.x-3*KITTY_WIDTH;
+        if (lander.x == kitty.x || kitty.speed.x == 0) {
+            nextstate = SITTING;
+        } else if (lander.x < kitty.x) {
+            nextstate = RUNNING_LEFT;
+        } else if (kitty.x < scratch) {
+            nextstate = RUNNING_RIGHT;
+        } else if (scratch < kitty.x) {
+            nextstate = JUMPING_RIGHT;
+        }
+    } else if (kitty.state == JUMPING_LEFT) {
+        if (kitty.y >= max-KITTY_HEIGHT) {
+            nextstate = SITTING;
         } else {
-            kitty.y = scratch;
+            nextstate = JUMPING_LEFT;
+        }
+    } else if (kitty.state == JUMPING_RIGHT) {
+        if (kitty.y >= max-KITTY_HEIGHT) {
+            nextstate = SITTING;
+        } else {
+            nextstate = JUMPING_RIGHT;
         }
     }
 
-    if (kitty.y < max-KITTY_HEIGHT) {
-        kitty.speed.y++; // Gravity
-    }
-
-    if (lander.x > kitty.x) {
-        kitty.speed.x = 4;
-    } else if (lander.x < kitty.x) {
-        kitty.speed.x = -4;
-    } else {
+    // Next state has been determined, now apply it physically
+    if (nextstate == SITTING) {
+        kitty.bitmap = &cat_sitting;
+        kitty.y = max-KITTY_HEIGHT;
+        kitty.speed.y = 0;
         kitty.speed.x = 0;
+    } else if (nextstate == RUNNING_LEFT) {
+        kitty.bitmap = &cat_runleft;
+        kitty.y = max-KITTY_HEIGHT;
+        kitty.speed.x = -4;
+        kitty.speed.y = 0;
+    } else if (nextstate == RUNNING_RIGHT) {
+        kitty.bitmap = &cat_runright;
+        kitty.y = max-KITTY_HEIGHT;
+        kitty.speed.x = 4;
+        kitty.speed.y = 0;
+    } else if (nextstate == JUMPING_LEFT) {
+        kitty.bitmap = &cat_runleft;
+        if (kitty.state != JUMPING_LEFT) { // Just starting a jump
+            kitty.speed.y = -5;
+        }
+    } else if (nextstate == JUMPING_RIGHT) {
+        kitty.bitmap = &cat_runright;
+        if (kitty.state != JUMPING_RIGHT) {
+            kitty.speed.y = -5;
+        }
     }
 
-    scratch = kitty.x + kitty.speed.x;
+    // Move cat horizontally within world limits
+    scratch = kitty.x+kitty.speed.x;
     if (scratch < 0) {
         kitty.x = 0;
         kitty.speed.x = 0;
@@ -117,38 +163,27 @@ void move_kitty(void)
         kitty.x = scratch;
     }
 
-    if (kitty.speed.x > 0) { // Jump range
-        if (scratch > lander.x) {
-            kitty.x = lander.x;
-            kitty.speed.x = 0;
-        } else if (scratch > lander.x-3*KITTY_WIDTH) {
-            kitty.speed.y = -3;
-        }
-    } else if (kitty.speed.x < 0) {
-        if (scratch < lander.x+KITTY_WIDTH) {
-            kitty.x = lander.x;
-            kitty.speed.x = 0;
-        } else if (scratch < lander.x+3*KITTY_WIDTH) {
-            kitty.speed.y = -3;
-        }
-    }
-
-    if (kitty.speed.y < 0) {
-        kitty.state = JUMPING;
+    // Move cat vertically
+    scratch = kitty.y+kitty.speed.y;
+    if (scratch < 0) {
+        kitty.y = 0;
+    } else if (scratch > max-KITTY_HEIGHT) {
+        kitty.y = max-KITTY_HEIGHT;
+        nextstate = SITTING; // Hit the side of a hill, special case violation
     } else {
-        if (kitty.speed.x > 0) {
-            kitty.bitmap = &cat_runright;
-            kitty.state = RUNNING_RIGHT;
-        } else if (kitty.speed.x < 0) {
-            kitty.bitmap = &cat_runleft;
-            kitty.state = RUNNING_LEFT;
-        } else {
-            kitty.bitmap = &cat_sitting;
-            kitty.state = SITTING;
-        }
+        kitty.y = scratch;
     }
 
+    // Apply gravity
+    if (kitty.y < max-KITTY_HEIGHT) {
+        kitty.speed.y++;
+    }
+
+    // Move to next animation 
     if (t%8 == 0) {
         kitty.stage = (kitty.stage+1)%CAT_RUNSTAGES;
     }
+
+    // Transition to next state for the next frame
+    kitty.state = nextstate;
 }
