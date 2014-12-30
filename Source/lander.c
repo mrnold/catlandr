@@ -42,6 +42,7 @@ void move_lander(void)
         if (kitty.y >= lander.y && kitty.y <= lander.y+LANDER_HEIGHT) { // Hit!
             if (kitty.speed.x == 0 && kitty.speed.y == 0) {
                 lander.speed.y = -SPEED_MAX; // Bat lander upwards
+                kitty.batting = true;
             } else {
                 lander.speed.x += kitty.speed.x;
                 lander.speed.y += kitty.speed.y;

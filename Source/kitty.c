@@ -1,5 +1,6 @@
 #include "bitmap.h"
 #include "lander.h"
+#include "misc.h"
 #include "moon.h"
 #include "physics.h"
 #include "ti86.h"
@@ -16,6 +17,7 @@ void init_kitty(void)
     kitty.stage = 0;
     kitty.state = SITTING;
     kitty.bitmap = &cat_sitting;
+    kitty.batting = false;
 }
 
 void draw_kitty(void)
@@ -125,7 +127,11 @@ void move_kitty(void)
 
     // Next state has been determined, now apply it physically
     if (nextstate == SITTING) {
-        kitty.bitmap = &cat_sitting;
+        if (kitty.batting) {
+            kitty.bitmap = &cat_batting;
+        } else {
+            kitty.bitmap = &cat_sitting;
+        }
         kitty.y = max-KITTY_HEIGHT;
         kitty.speed.y = 0;
         kitty.speed.x = 0;
@@ -149,6 +155,10 @@ void move_kitty(void)
         if (kitty.state != JUMPING_RIGHT) {
             kitty.speed.y = -5;
         }
+    }
+
+    if (kitty.batting && nextstate != SITTING) {
+        kitty.batting = false;
     }
 
     // Move cat horizontally within world limits
