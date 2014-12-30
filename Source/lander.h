@@ -30,5 +30,6 @@ struct lander_t {
 
 void draw_lander(void);
 void init_lander(void);
+void move_lander(void);
 
 extern struct lander_t lander;

@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "kitty.h"
 #include "lander.h"
 #include "misc.h"
 #include "moon.h"
@@ -25,6 +26,109 @@ void init_lander(void)
     lander.crashed = false;
     lander.landed = false;
     lander.perched = false;
+}
+
+void move_lander(void)
+{
+    unsigned int landerlimit;
+    unsigned char feet;
+    int scratch;
+
+    lander.previous.x = lander.x;
+    lander.previous.y = lander.y;
+    previouscamera = camera;
+
+    if (kitty.x+KITTY_WIDTH >= lander.x && kitty.x <= lander.x+LANDER_WIDTH) {
+        if (kitty.y >= lander.y && kitty.y <= lander.y+LANDER_HEIGHT) { // Hit!
+            if (kitty.speed.x == 0 && kitty.speed.y == 0) {
+                lander.speed.y = -6; // Sitting cat, bat lander upwards
+            } else {
+                lander.speed.x += kitty.speed.x;
+                lander.speed.y += kitty.speed.y;
+            }
+        }
+    }
+
+    lander.speed.x += lander.acceleration.x/2;
+    if (lander.speed.x > 0) {
+        if (lander.speed.x > SPEED_MAX) {
+            lander.speed.x = SPEED_MAX;
+        } else {
+            lander.speed.x--;
+        }
+    } else if (lander.speed.x < 0) {
+        if (lander.speed.x < -SPEED_MAX) {
+            lander.speed.x = -SPEED_MAX;
+        } else {
+            lander.speed.x++;
+        }
+    }
+
+    feet = lander.y+LANDER_HEIGHT;
+    landerlimit = MOON_WIDTH-LANDER_WIDTH;
+    scratch = (int)lander.x + (int)lander.speed.x;
+    if (scratch >= (int)landerlimit) {
+        lander.x = landerlimit;
+        lander.speed.x = 0;
+    } else if (scratch <= 0) {
+        lander.speed.x = 0;
+        lander.x = 0;
+    } else {
+        lander.x = (unsigned int)scratch;
+    }
+
+    scratch = lander.x-camera;
+    if (scratch < LANDER_WIDTH) {
+        scratch = lander.x-LANDER_WIDTH;
+        if (scratch < 0) {
+            camera = 0;
+        } else {
+            camera = scratch;
+        }
+    }
+
+    scratch = camera+SCREEN_WIDTH-lander.x;
+    if (scratch < 2*LANDER_WIDTH) {
+        scratch = lander.x+2*LANDER_WIDTH-SCREEN_WIDTH;
+        if (scratch+SCREEN_WIDTH > MOON_WIDTH) {
+            camera = MOON_WIDTH-SCREEN_WIDTH;
+        } else {
+            camera = scratch;
+        }
+    }
+
+
+    lander.speed.y += lander.acceleration.y/2;
+    if (lander.speed.y > SPEED_MAX) {
+        lander.speed.y = SPEED_MAX;
+    } else if (lander.speed.y < -SPEED_MAX) {
+        lander.speed.y = -SPEED_MAX;
+    }
+
+    if (lander.speed.y > 0) { //Screen down
+        landerlimit = SCREEN_HEIGHT-LANDER_HEIGHT;
+        lander.y += lander.speed.y/4;
+        if (lander.y > landerlimit) {
+            lander.y = landerlimit;
+            lander.speed.y = 0;
+            lander.acceleration.y = 0;
+        }
+    } else if (lander.speed.y < 0) { //Screen up
+        scratch = lander.y + lander.speed.y/4;
+        if (scratch < 0) {
+            lander.y = 0;
+            lander.speed.y = 0;
+            if (lander.acceleration.y < -GRAVITY) { // "Hang time"
+                lander.acceleration.y = -GRAVITY;
+            }
+        } else {
+            lander.y = scratch;
+        }
+    }
+
+    if (lander.speed.y < 0) {
+        lander.perched = false;
+    }
 }
 
 void draw_lander(void)
