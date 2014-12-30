@@ -26,6 +26,9 @@ void init_lander(void)
     lander.crashed = false;
     lander.landed = false;
     lander.perched = false;
+    lander.fuel = 127;
+    lander.food = 31;
+    lander.air = 255;
 }
 
 void move_lander(void)
@@ -33,6 +36,7 @@ void move_lander(void)
     unsigned int landerlimit;
     unsigned char feet;
     int scratch;
+    char rand;
 
     lander.previous.x = lander.x;
     lander.previous.y = lander.y;
@@ -42,6 +46,12 @@ void move_lander(void)
         if (kitty.y >= lander.y && kitty.y <= lander.y+LANDER_HEIGHT) { // Hit!
             if (kitty.speed.x == 0 && kitty.speed.y == 0) {
                 lander.speed.y = -SPEED_MAX; // Bat lander upwards
+                rand = (char)((random8()<<1)&0x82);
+                if (rand > 0) {
+                    lander.speed.x = SPEED_MAX;
+                } else if (rand < 0) {
+                    lander.speed.x = -SPEED_MAX;
+                }
                 kitty.batting = true;
             } else {
                 lander.speed.x += kitty.speed.x;
