@@ -22,26 +22,29 @@ void init_physics(void)
 void collisions(void)
 {
     unsigned int i;
-    unsigned char max;
     unsigned char same;
+    unsigned char max = SCREEN_HEIGHT;
+    unsigned int edge = lander.x+LANDER_WIDTH;
     unsigned char feet = lander.y+LANDER_HEIGHT;
-    unsigned char edge = lander.x+LANDER_WIDTH;
 
-    if (moon[lander.x] <= feet) { // Screen up is negative
-        same = true;
-        for (i = edge-1; i > lander.x+1; i--) {
-            if (moon[i] != moon[i-1]) {
-                same = false;
-                break;
-            }
+    same = true; // Look for a flat landing surface underfoot
+    for (i = edge-1; i > lander.x+1; i--) {
+        if (moon[i] != moon[i-1]) {
+            same = false;
         }
-        if (same) {
+        if (moon[i] < max) {
+            max = moon[i];
+        }
+    }
+
+    if (feet >= max) { // Lander touched down on something
+        if (same) { // Found a flat spot! Make sure we didn't land too hard
             if (lander.speed.y > IMPACT_MAX) {
-                lander.bitmap = img_downcrash;
+                lander.bitmap = img_downcrash; // Too hard! Explode
                 lander.crashed = true;
             } else {
-                if (lander.x > landingpad && lander.x < landingpad+LANDINGPAD_WIDTH) {
-                    lander.landed = true;
+                if (lander.x > landingpad && edge < landingpad+LANDINGPAD_WIDTH) {
+                    lander.landed = true; // Victory!
                 }
             }
             lander.y = moon[lander.x]-LANDER_HEIGHT;
@@ -50,11 +53,11 @@ void collisions(void)
             lander.speed.x = 0;
             lander.speed.y = 0;
             return;
-        } else {
+        } else { // Uneven ground, 
             if (lander.speed.y > IMPACT_MAX) {
                 lander.bitmap = img_downcrash;
                 lander.crashed = true;
-                lander.y = moon[lander.x]-LANDER_HEIGHT;
+                lander.y = max-LANDER_HEIGHT;
                 lander.acceleration.x = 0;
                 lander.acceleration.y = 0;
                 lander.speed.x = 0;
@@ -66,6 +69,7 @@ void collisions(void)
         }
     }
 
+    // Check if we are about to run into the side of a hill
     if (lander.speed.x > 0) {
         feet = lander.previous.y+LANDER_HEIGHT;
         edge = lander.previous.x+LANDER_WIDTH;
@@ -86,6 +90,8 @@ void collisions(void)
                     camera = previouscamera;
                     return;
                 } else {
+                    lander.x = lander.previous.x;
+                    lander.acceleration.x = 0;
                     lander.speed.x = -1*lander.speed.x/2;
                     if (lander.speed.x > -1) {
                         lander.speed.x = -1; // Bounce!
@@ -93,7 +99,7 @@ void collisions(void)
                 }
             }
         }
-    } else if (lander.speed.x < 0) {
+    } else if (lander.speed.x < 0) { // Same but from the right
         feet = lander.previous.y+LANDER_HEIGHT;
         edge = lander.previous.x;
         for (i = edge; i > edge+lander.speed.x; i--) {
@@ -113,28 +119,14 @@ void collisions(void)
                     camera = previouscamera;
                     return;
                 } else {
+                    lander.x = edge;
+                    lander.acceleration.x = 0;
                     lander.speed.x = -1*lander.speed.x/2;
                     if (lander.speed.x < 1) {
                         lander.speed.x = 1; // Bounce!
                     }
                 }
             }
-        }
-    }
-
-    if (lander.speed.y > 0) {
-        edge = lander.previous.x;
-        max = edge;
-        for (i = edge; i < edge+LANDER_WIDTH; i++) {
-            if (moon[i] < moon[max]) {
-                max = i;
-            }
-        }
-        if (moon[max] < lander.previous.y+lander.speed.y) {
-            lander.y = moon[max]-LANDER_HEIGHT;
-            lander.perched = true;
-            lander.acceleration.y = 0;
-            lander.speed.y = 0;
         }
     }
 }
