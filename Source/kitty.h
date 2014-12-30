@@ -4,8 +4,9 @@
 enum kitty_states {
     RUNNING_RIGHT,
     RUNNING_LEFT,
+    JUMPING_LEFT,
+    JUMPING_RIGHT,
     SITTING,
-    JUMPING
 };
 
 struct kitty_t {
