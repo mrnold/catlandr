@@ -193,7 +193,7 @@ void apply_input(void)
             }
         }
     } else {
-        if (!lander.crashed && !lander.perched) {
+        if (!lander.crashed) {
             lander.acceleration.y = GRAVITY;
         }
         lander.thrust.vp_firing = false;

@@ -24,7 +24,6 @@ struct lander_t {
     } thrust;
     unsigned char crashed;
     unsigned char landed;
-    unsigned char perched;
     unsigned char *bitmap;
     unsigned char fuel;
     unsigned char food;
