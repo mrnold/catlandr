@@ -1,6 +1,9 @@
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 
+extern __at (0x8100) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
+extern __at (0xb000) unsigned char screenbuffer[SCREEN_HEIGHT][SCREEN_WIDTH/8];
+
 union keyrow_0 {
     struct {
         unsigned char K_F5   : 1;
@@ -40,3 +43,4 @@ void scan_row_0(union keyrow_0 *);
 void screencopy(void) __naked;
 void prerender(void);
 void draw_moon(void) __naked;
+void printxy(unsigned char, unsigned char, const char * const);

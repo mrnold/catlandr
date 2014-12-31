@@ -9,6 +9,8 @@ unsigned int t; // Time tick to be updated ~25 times/sec
 unsigned int camera;
 unsigned int previouscamera;
 extern unsigned char running;
+extern unsigned char reset;
+extern unsigned char menu;
 
 void init_physics(void)
 {
@@ -22,13 +24,14 @@ void init_physics(void)
 void collisions(void)
 {
     unsigned int i;
+    unsigned char max;
     unsigned char same;
-    unsigned char max = SCREEN_HEIGHT;
     unsigned int edge = lander.x+LANDER_WIDTH;
     unsigned char feet = lander.y+LANDER_HEIGHT;
 
     same = true; // Look for a flat landing surface underfoot
-    for (i = edge-1; i > lander.x+1; i--) {
+    max = moon[lander.x];
+    for (i = lander.x+1; i < edge; i++) {
         if (moon[i] != moon[i-1]) {
             same = false;
         }
@@ -43,7 +46,7 @@ void collisions(void)
                 lander.bitmap = img_downcrash; // Too hard! Explode
                 lander.crashed = true;
             } else {
-                if (lander.x > landingpad && edge < landingpad+LANDINGPAD_WIDTH) {
+                if (lander.x >= landingpad && edge <= landingpad+LANDINGPAD_WIDTH) {
                     lander.landed = true; // Victory!
                 }
             }
@@ -202,5 +205,13 @@ void apply_input(void)
 
     if (k0.keys.K_EXIT) {
         running = false;
+        menu = false;
+    }
+    if (k0.keys.K_F2) {
+        reset = true;
+    }
+    if (k0.keys.K_F1) {
+        running = false;
+        menu = true;
     }
 }

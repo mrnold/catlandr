@@ -156,12 +156,12 @@ void move_kitty(void)
     } else if (nextstate == JUMPING_LEFT) {
         kitty.bitmap = &cat_runleft;
         if (kitty.state != JUMPING_LEFT) { // Just starting a jump
-            kitty.speed.y = -5;
+            kitty.speed.y = (lander.y-kitty.y)/8;
         }
     } else if (nextstate == JUMPING_RIGHT) {
         kitty.bitmap = &cat_runright;
         if (kitty.state != JUMPING_RIGHT) {
-            kitty.speed.y = -5;
+            kitty.speed.y = (lander.y-kitty.y)/8;
         }
     }
 

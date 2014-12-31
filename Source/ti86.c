@@ -9,14 +9,20 @@ static void (*callback_function)(void);
 __at (0x8100) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
 __at (0xb000) unsigned char screenbuffer[SCREEN_HEIGHT][SCREEN_WIDTH/8];
 
-void putchar(char c) __naked
+__at (0xc37c) unsigned char textcol;
+__at (0xc37d) unsigned char textrow;
+
+void printxy(unsigned char col, unsigned char row, const char * const string)
 {
-    c;
+    string;
+    textcol = col;
+    textrow = row;
     __asm
-        di
-        call 0x4a2b
-        ei
-        ret
+        push hl
+        ld l, 6(ix)
+        ld h, 7(ix)
+        call #0x4aa5
+        pop hl
     __endasm;
 }
 
@@ -41,27 +47,6 @@ void clear_screen(void) __naked
         ld (hl), a
         ld bc, #0x03ff
         ld de, #0xfc01
-        ldir
-        pop hl
-        pop de
-        pop bc
-        pop af
-        ret
-    __endasm;
-}
-
-void clear_buffer(void) __naked
-{
-    __asm
-        push af
-        push bc
-        push de
-        push hl
-        ld hl, #_screenbuffer
-        xor a
-        ld (hl), a
-        ld bc, #0x03ff
-        ld de, #_screenbuffer+1
         ldir
         pop hl
         pop de
