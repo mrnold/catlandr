@@ -16,7 +16,7 @@ void init_kitty(void)
     kitty.speed.y = 0;
     kitty.stage = 0;
     kitty.state = SITTING;
-    kitty.bitmap = &cat_sitting;
+    kitty.bitmap = &cat_sittingleft;
     kitty.batting = false;
 }
 
@@ -94,7 +94,7 @@ void move_kitty(void)
         if (lander.x == kitty.x || kitty.speed.x == 0) {
             nextstate = SITTING;
         } else if (lander.x > kitty.x) {
-            nextstate = RUNNING_RIGHT;
+            nextstate = SITTING;
         } else if (kitty.x > scratch) {
             nextstate = RUNNING_LEFT;
         } else if (scratch > kitty.x) {
@@ -109,7 +109,7 @@ void move_kitty(void)
         if (lander.x == kitty.x || kitty.speed.x == 0) {
             nextstate = SITTING;
         } else if (lander.x < kitty.x) {
-            nextstate = RUNNING_LEFT;
+            nextstate = SITTING;
         } else if (kitty.x < scratch) {
             nextstate = RUNNING_RIGHT;
         } else if (scratch < kitty.x) {
@@ -137,8 +137,15 @@ void move_kitty(void)
     if (nextstate == SITTING) {
         if (kitty.batting) {
             kitty.bitmap = &cat_batting;
-        } else {
-            kitty.bitmap = &cat_sitting;
+        } else { // Check previous state to decide which way to sit
+            switch (kitty.state) {
+                case JUMPING_LEFT:
+                case RUNNING_LEFT:
+                    kitty.bitmap = &cat_sittingleft; break;
+                case JUMPING_RIGHT:
+                case RUNNING_RIGHT:
+                    kitty.bitmap = &cat_sittingright; break;
+            }
         }
         kitty.y = max-KITTY_HEIGHT;
         kitty.speed.y = 0;
@@ -171,7 +178,7 @@ void move_kitty(void)
 
     // Move cat horizontally within world limits
     scratch = kitty.x+kitty.speed.x;
-    if (scratch < 0) {
+    if (scratch <= 0) {
         kitty.x = 0;
         kitty.speed.x = 0;
     } else if (scratch > MOON_WIDTH-KITTY_WIDTH) {
@@ -183,11 +190,10 @@ void move_kitty(void)
 
     // Move cat vertically
     scratch = kitty.y+kitty.speed.y;
-    if (scratch < 0) {
+    if (scratch <= 0) {
         kitty.y = 0;
     } else if (scratch > max-KITTY_HEIGHT) {
         kitty.y = max-KITTY_HEIGHT;
-        nextstate = SITTING; // Hit the side of a hill, special case violation
     } else {
         kitty.y = scratch;
     }

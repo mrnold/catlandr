@@ -33,21 +33,25 @@ char *loading[] = {
 
 int main(void)
 {
-    unsigned char rand = random8()%4;
     menu = true;
     running = false;
     clear_screen();
-    printxy(0, 0, loading[rand]);
+    printxy(0, 0, loading[random8()%4]);
     init();
 
     while (menu || running) {
         menusequence();
+        printxy(0, 0,  "EXIT to quit");
+        printxy(0, 6,  "F1 for this menu");
+        printxy(0, 12, "F2 for a new moon");
+        printxy(0, 18, "2ND to drop a kibble");
+        printxy(0, 24, "Arrow keys for thrusters");
+
+        printxy(89, 0,  "Land safely");
+        printxy(85, 6,  "to feed Luna!");
+        printxy(88, 12, "Thrust up to");
+        printxy(88, 18, "get started!");
         while (menu) {
-            printxy(0, 0,  "EXIT to quit");
-            printxy(0, 6, "F1 for this menu");
-            printxy(0, 12, "F2 for a new moon");
-            printxy(0, 18, "2ND to drop a kibble");
-            printxy(0, 24, "Arrow keys for thrusters");
             menu_input();
         }
 
@@ -83,7 +87,7 @@ void force_call(void)
 void gamesequence(void)
 {
     apply_input();
-    //move_kitty();
+    move_kitty();
     move_lander();
     collisions();
     draw_moon();
