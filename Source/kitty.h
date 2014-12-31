@@ -6,7 +6,7 @@ enum kitty_states {
     RUNNING_LEFT,
     JUMPING_LEFT,
     JUMPING_RIGHT,
-    SITTING,
+    SITTING
 };
 
 struct kitty_t {

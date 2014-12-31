@@ -44,3 +44,4 @@ void screencopy(void) __naked;
 void prerender(void);
 void draw_moon(void) __naked;
 void printxy(unsigned char, unsigned char, const char * const);
+void draw_status(void);

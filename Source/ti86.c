@@ -1,3 +1,4 @@
+#include "lander.h"
 #include "moon.h"
 #include "physics.h"
 #include "ti86.h"
@@ -413,3 +414,18 @@ void draw_moon(void)
 }
 
 */
+
+void draw_status(void)
+{
+    unsigned char i;
+    unsigned char x = lander.fuel/(SCREEN_WIDTH/8);
+    unsigned char shift = (lander.fuel/2)%8;
+
+    if (lander.fuel == 0) {
+        return;
+    }
+    for (i = 0; i < x; i++) {
+        *(((unsigned char *)screenbuffer)+i) = 0xff;
+    }
+    *(((unsigned char *)screenbuffer)+i) |= ((char)0x80 >> shift);
+}

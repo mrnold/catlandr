@@ -6,6 +6,9 @@
 #include "physics.h"
 #include "ti86.h"
 
+extern unsigned char running;
+extern unsigned char menu;
+
 struct lander_t lander;
 
 void init_lander(void)
@@ -23,11 +26,37 @@ void init_lander(void)
     lander.thrust.hn_firing = 0;
     lander.thrust.vp_stage = 0;
     lander.thrust.vp_firing = 0;
+    lander.stranded = false;
     lander.crashed = false;
     lander.landed = false;
-    lander.fuel = 127;
+    lander.fuel = 255;
     lander.food = 31;
-    lander.air = 255;
+}
+
+void stop_lander(unsigned char state)
+{
+    switch (state) {
+        case STRANDED:
+            lander.stranded = true;
+            lander.crashed = false;
+            lander.landed = false;
+            break;
+        case CRASHED:
+            lander.stranded = false;
+            lander.crashed = true;
+            lander.landed = false;
+            break;
+        case LANDED:
+            lander.stranded = false;
+            lander.crashed = false;
+            lander.landed = true;
+            break;
+    }
+    lander.thrust.hp_firing = false;
+    lander.thrust.hn_firing = false;
+    lander.thrust.vp_firing = false;
+    running = false;
+    menu = true;
 }
 
 void move_lander(void)
@@ -42,6 +71,7 @@ void move_lander(void)
     previouscamera = camera;
 
     if (lander.crashed) {
+        kitty.bitmap = &cat_sittingleft;
         kitty.batting = false;
         return;
     }
