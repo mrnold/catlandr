@@ -1,6 +1,12 @@
 #define LANDER_WIDTH 8
 #define LANDER_HEIGHT 8
 
+enum lander_stops {
+    STRANDED,
+    CRASHED,
+    LANDED
+};
+
 struct lander_t {
     unsigned short x;
     unsigned char y;
@@ -24,14 +30,15 @@ struct lander_t {
     } thrust;
     unsigned char crashed;
     unsigned char landed;
+    unsigned char stranded;
     unsigned char *bitmap;
     unsigned char fuel;
     unsigned char food;
-    unsigned char air;
 };
 
 void draw_lander(void);
 void init_lander(void);
 void move_lander(void);
+void stop_lander(unsigned char);
 
 extern struct lander_t lander;

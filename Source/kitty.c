@@ -80,7 +80,7 @@ void move_kitty(void)
 
     // Cat state machine
     if (kitty.state == SITTING) { // Initial state
-        if (lander.x == kitty.x) { // State transitions
+        if (lander.x == kitty.x || lander.crashed || lander.landed) {
             nextstate = SITTING;
         } else if (lander.x+LANDER_WIDTH < kitty.x) {
             nextstate = RUNNING_LEFT;
@@ -145,7 +145,7 @@ void move_kitty(void)
                 case JUMPING_RIGHT:
                 case RUNNING_RIGHT:
                     kitty.bitmap = &cat_sittingright; break;
-            }
+            } // Pass through case: remember previous sprite
         }
         kitty.y = max-KITTY_HEIGHT;
         kitty.speed.y = 0;

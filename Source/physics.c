@@ -9,7 +9,6 @@ unsigned int t; // Time tick to be updated ~25 times/sec
 unsigned int camera;
 unsigned int previouscamera;
 extern unsigned char running;
-extern unsigned char reset;
 extern unsigned char menu;
 
 void init_physics(void)
@@ -44,10 +43,10 @@ void collisions(void)
         if (same) { // Found a flat spot! Make sure we didn't land too hard
             if (lander.speed.y > IMPACT_MAX) {
                 lander.bitmap = img_downcrash; // Too hard! Explode
-                lander.crashed = true;
+                stop_lander(CRASHED);
             } else {
                 if (lander.x >= landingpad && edge <= landingpad+LANDINGPAD_WIDTH) {
-                    lander.landed = true; // Victory!
+                    stop_lander(LANDED); // Victory!
                 }
             }
             lander.y = moon[lander.x]-LANDER_HEIGHT;
@@ -59,7 +58,7 @@ void collisions(void)
         } else { // Uneven ground, 
             if (lander.speed.y > IMPACT_MAX) {
                 lander.bitmap = img_downcrash;
-                lander.crashed = true;
+                stop_lander(CRASHED);
                 lander.y = max-LANDER_HEIGHT;
                 lander.acceleration.x = 0;
                 lander.acceleration.y = 0;
@@ -68,6 +67,9 @@ void collisions(void)
                 return;
             } else {
                 lander.speed.y = -1*lander.speed.y/2;
+                if (lander.speed.y == 0 && lander.fuel == 0) {
+                    stop_lander(STRANDED);
+                }
             }
         }
     }
@@ -83,7 +85,7 @@ void collisions(void)
             if (moon[i] < feet) {
                 if (lander.speed.x > IMPACT_MAX) {
                     lander.bitmap = img_rightcrash;
-                    lander.crashed = true;
+                    stop_lander(CRASHED);
                     lander.x = i-LANDER_WIDTH;
                     lander.y = lander.previous.y;
                     lander.acceleration.x = 0;
@@ -112,7 +114,7 @@ void collisions(void)
             if (moon[i] < feet) {
                 if (lander.speed.x < -IMPACT_MAX) {
                     lander.bitmap = img_leftcrash;
-                    lander.crashed = true;
+                    stop_lander(CRASHED);
                     lander.x = i;
                     lander.y = lander.previous.y;
                     lander.acceleration.x = 0;
@@ -206,9 +208,6 @@ void apply_input(void)
     if (k0.keys.K_EXIT) {
         running = false;
         menu = false;
-    }
-    if (k0.keys.K_F2) {
-        reset = true;
     }
     if (k0.keys.K_F1) {
         running = false;

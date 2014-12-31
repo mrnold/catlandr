@@ -11,10 +11,11 @@ unsigned int ticks;
 unsigned int frames;
 unsigned int dropped;
 unsigned char running;
-unsigned char reset;
 unsigned char menu;
 
 void init(void);
+void reset(void);
+void showmenu(void);
 void perfcheck(void);
 void gamesequence(void);
 void menusequence(void);
@@ -31,28 +32,27 @@ char *loading[] = {
     "Planting flags..."
 };
 
-int main(void)
+void init(void)
 {
     menu = true;
     running = false;
-    clear_screen();
     printxy(0, 0, loading[random8()%4]);
-    init();
+    reset();
+}
 
+int main(void)
+{
+    clear_screen();
+    init();
     while (menu || running) {
         menusequence();
-        printxy(0, 0,  "EXIT to quit");
-        printxy(0, 6,  "F1 for this menu");
-        printxy(0, 12, "F2 for a new moon");
-        printxy(0, 18, "2ND to drop a kibble");
-        printxy(0, 24, "Arrow keys for thrusters");
-
-        printxy(89, 0,  "Land safely");
-        printxy(85, 6,  "to feed Luna!");
-        printxy(88, 12, "Thrust up to");
-        printxy(88, 18, "get started!");
+        showmenu();
         while (menu) {
+            wait_lock(idle_lock);
             menu_input();
+            while (is_locked(idle_lock)) {
+                idle();
+            }
         }
 
         while (running) {
@@ -63,13 +63,14 @@ int main(void)
             t++; // This should be done after all physics calls are finished
             drop_lock(frame_lock);
 
-            if (reset) {
-                init();
-            }
             if (running) {
                 perfcheck();
                 while (is_locked(idle_lock)) {
                     idle();
+                }
+            } else {
+                if (lander.crashed || lander.landed || lander.stranded) {
+                    menu = true;
                 }
             }
         }
@@ -93,6 +94,7 @@ void gamesequence(void)
     draw_moon();
     draw_lander();
     draw_kitty();
+    draw_status();
     screencopy();
     force_call();
 }
@@ -103,15 +105,13 @@ void menusequence(void)
     draw_lander();
     draw_kitty();
     screencopy();
-    menu_input();
 }
 
-void init(void)
+void reset(void)
 {
     ticks = 0;
     frames = 0;
     dropped = 0;
-    reset = false;
 
     init_kitty();
     init_lander();
@@ -154,8 +154,37 @@ void menu_input(void)
         menu = false;
     }
 
-    if (k6.raw) {
+    if (k6.raw && !lander.landed && !lander.crashed && !lander.stranded) {
         running = true;
         menu = false;
+    }
+
+    if (k0.keys.K_F2) {
+        init();
+        menusequence();
+        showmenu();
+    }
+}
+
+void showmenu(void)
+{
+    printxy(0, 0,  "EXIT to quit");
+    printxy(0, 6,  "F1 for this menu");
+    printxy(0, 12, "F2 for a new moon");
+    printxy(0, 18, "2ND to drop a kibble");
+    printxy(0, 24, "Arrow keys for thrusters");
+
+    if (lander.crashed) {
+        printxy(87, 6, "Lander");
+        printxy(91, 12, "destroyed!");
+    } else if (lander.stranded) {
+        printxy(80, 6, "Out of fuel!");
+    } else if (lander.landed) {
+        printxy(80, 6, "Safe landing!");
+    } else {
+        printxy(89, 0,  "Land safely");
+        printxy(85, 6,  "to feed Luna!");
+        printxy(88, 12, "Thrust up to");
+        printxy(88, 18, "get started!");
     }
 }
