@@ -42,6 +42,7 @@ void move_lander(void)
     previouscamera = camera;
 
     if (lander.crashed) {
+        kitty.batting = false;
         return;
     }
 
