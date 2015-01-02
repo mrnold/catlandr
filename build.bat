@@ -15,11 +15,18 @@
 %COMPILE% Source\moon.c
 %COMPILE% Source\physics.c
 %COMPILE% Source\ti86.c
-%BUILD%   Source\main.c
+%BUILD% Source\main.c
+
 @rem SDCC generates main.ihx instead of main.c.ihx?
 Tools\hex2bin Build\Source\main.ihx
+
+@rem Patch the binary to initialize globals. Usually SDCC expects this to be
+@rem done in the startup code, but this is not necessary on a TI.
+python Tools\trim.py Build\Source\main.c.map Build\Source\main.bin 0xD746
+
 @rem Reminder: binpack8x.py patch: basepath, fnamein = os.path.split(fnamein)
 python Tools\binpac8x.py -6 -O LUNALNDR Build\Source\main.bin
+
 @copy /y Build\Source\main.86p luna.86p
 @goto :done
 
@@ -37,7 +44,7 @@ python Tools\binpac8x.py -6 -O LUNALNDR Build\Source\main.bin
 :build
 @mkdir Build\%1 > NUL 2>&1
 @rmdir Build\%1 > NUL 2>&1
-%SDCCBASE% --out-fmt-ihx -o Build\%1.ihx --data-loc 0 --code-loc 0xD751 %LINKS% %1
+%SDCCBASE% --out-fmt-ihx -o Build\%1.ihx --data-loc 0 --code-loc 0xD74E %LINKS% %1
 @goto :done
 
 :done
