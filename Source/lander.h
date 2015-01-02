@@ -31,7 +31,7 @@ struct lander_t {
     unsigned char crashed;
     unsigned char landed;
     unsigned char stranded;
-    unsigned char *bitmap;
+    const unsigned char *bitmap;
     unsigned char fuel;
     unsigned char food;
 };

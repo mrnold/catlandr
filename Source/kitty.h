@@ -12,7 +12,7 @@ enum kitty_states {
 struct kitty_t {
     unsigned short x;
     unsigned char y;
-    unsigned char (*bitmap)[8][CAT_RUNSTAGES];
+    const unsigned char (*bitmap)[][CAT_RUNSTAGES];
     unsigned char state;
     unsigned char stage;
     unsigned char batting;
