@@ -18,14 +18,14 @@
 %BUILD% Source\main.c
 
 @rem SDCC generates main.ihx instead of main.c.ihx?
-Tools\hex2bin Build\Source\main.ihx
+python Tools\ihxtobin.py Build\Source\main.ihx
 
 @rem Patch the binary to initialize globals. Usually SDCC expects this to be
 @rem done in the startup code, but this is not necessary on a TI.
-python Tools\trim.py Build\Source\main.c.map Build\Source\main.bin 0xD746
+python Tools\trim.py Build\Source\main.c.map Build\Source\main.ihx.bin 0xD746
 
 @rem Reminder: binpack8x.py patch: basepath, fnamein = os.path.split(fnamein)
-python Tools\binpac8x.py -6 -O LUNALNDR Build\Source\main.bin
+python Tools\binpac8x.py -6 -O LUNALNDR Build\Source\main.ihx.bin
 
 @copy /y Build\Source\main.86p luna.86p
 @goto :done
