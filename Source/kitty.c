@@ -22,7 +22,7 @@ void init_kitty(void)
 
 void draw_kitty(void)
 {
-    draw_live_sprite(*kitty.bitmap, kitty.stage, kitty.x, kitty.y);
+    draw_live_sprite(*kitty.bitmap, kitty.stage, kitty.x, kitty.y, 0);
 }
 
 void move_kitty(void)

@@ -177,14 +177,14 @@ void draw_lander(void)
     draw_static_sprite_noclip(lander.bitmap, lander.x, lander.y);
 
     if (lander.thrust.hp_firing) { // Draw left thruster
-        draw_live_sprite(img_thrustleft, lander.thrust.hp_stage, lander.x-8, lander.y);
+        draw_live_sprite(img_thrustleft, lander.thrust.hp_stage, lander.x, lander.y, -8);
     }
 
     if (lander.thrust.hn_firing) { // Draw right thruster
-        draw_live_sprite(img_thrustright, lander.thrust.hn_stage, lander.x+8, lander.y);
+        draw_live_sprite(img_thrustright, lander.thrust.hn_stage, lander.x, lander.y, 8);
     }
 
     if (lander.thrust.vp_firing) {
-        draw_live_sprite(img_thrustdown, lander.thrust.vp_stage, lander.x, lander.y+8);
+        draw_live_sprite(img_thrustdown, lander.thrust.vp_stage, lander.x, lander.y+8, 0);
     }
 }
