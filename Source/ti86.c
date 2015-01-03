@@ -451,9 +451,9 @@ void draw_static_sprite_noclip(const unsigned char image[8], unsigned short x, u
 
 // World x, not screen x.
 void draw_live_sprite(const unsigned char animation[8][4],
-        unsigned char frame, unsigned short x, unsigned char y)
+        unsigned char frame, unsigned short x, unsigned char y, char offset)
 {
-    const unsigned int yoffset = y*16;
+    unsigned int yoffset = y*16;
 
     unsigned char i, rshift, lshift, imgbyte, *screenbyte, screenx;
     unsigned int start;
@@ -463,7 +463,7 @@ void draw_live_sprite(const unsigned char animation[8][4],
         return;
     }
 
-    scratch = x-camera;
+    scratch = x-camera+offset;
     screenx = (unsigned char)scratch;
 
     rshift = screenx%8;
@@ -471,7 +471,7 @@ void draw_live_sprite(const unsigned char animation[8][4],
     start = screenx/8+yoffset;
 
     screenbyte = (unsigned char *)screenbuffer+start;
-    if (scratch >= 0 && scratch < SCREEN_WIDTH-8) {
+    if (scratch >= 0 && scratch <= SCREEN_WIDTH-8) {
         for (i = 0; i < 8; i++) {
             imgbyte = animation[i][frame];
             *screenbyte |= (imgbyte >> rshift);
@@ -479,12 +479,13 @@ void draw_live_sprite(const unsigned char animation[8][4],
             screenbyte += 16;
         }
     } else if (scratch < 0 && scratch > -8) {
+        screenbyte = (unsigned char *)screenbuffer+yoffset;
         for (i = 0; i < 8; i++) {
             imgbyte = animation[i][frame];
             *(screenbyte) |= (imgbyte << lshift);
             screenbyte += 16;
         }
-    } else if (scratch >= 0 && scratch < SCREEN_WIDTH) {
+    } else if (scratch < SCREEN_WIDTH && scratch+8 > SCREEN_WIDTH) {
         for (i = 0; i < 8; i++) {
             imgbyte = animation[i][frame];
             *screenbyte |= (imgbyte >> rshift);
