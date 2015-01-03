@@ -29,7 +29,7 @@ char *loading[] = {
     "Creating lunar surface...",
     "Waxing the moon...",
     "Tranquilizing seas...",
-    "Planting flags..."
+    "Herding cats..."
 };
 
 void init(void)
