@@ -59,8 +59,6 @@ void stop_lander(unsigned char state)
 
 void move_lander(void)
 {
-    unsigned int landerlimit;
-    unsigned char feet;
     int scratch;
     char rand;
 
@@ -107,11 +105,9 @@ void move_lander(void)
         }
     }
 
-    feet = lander.y+LANDER_HEIGHT;
-    landerlimit = MOON_WIDTH-LANDER_WIDTH;
     scratch = (int)lander.x + (int)lander.speed.x;
-    if (scratch >= (int)landerlimit) {
-        lander.x = landerlimit;
+    if (scratch >= (MOON_WIDTH-LANDER_WIDTH)) {
+        lander.x = (MOON_WIDTH-LANDER_WIDTH);
         lander.speed.x = 0;
     } else if (scratch <= 0) {
         lander.speed.x = 0;
@@ -149,10 +145,9 @@ void move_lander(void)
     }
 
     if (lander.speed.y > 0) { //Screen down
-        landerlimit = SCREEN_HEIGHT-LANDER_HEIGHT;
         lander.y += lander.speed.y/4;
-        if (lander.y > landerlimit) {
-            lander.y = landerlimit;
+        if (lander.y > (SCREEN_HEIGHT-LANDER_HEIGHT)) {
+            lander.y = (SCREEN_HEIGHT-LANDER_HEIGHT);
             lander.speed.y = 0;
             lander.acceleration.y = 0;
         }

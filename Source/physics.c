@@ -40,28 +40,21 @@ void collisions(void)
     }
 
     if (feet >= max) { // Lander touched down on something
+        lander.y = max-LANDER_HEIGHT;
+        if (lander.speed.y > IMPACT_MAX) {
+            lander.bitmap = img_downcrash;
+            stop_lander(CRASHED);
+            return;
+        }
         if (same) { // Found a flat spot! Make sure we didn't land too hard
-            if (lander.speed.y > IMPACT_MAX) {
-                lander.bitmap = img_downcrash; // Too hard! Explode
-                stop_lander(CRASHED);
-            } else {
-                if (lander.x >= landingpad && edge <= landingpad+LANDINGPAD_WIDTH) {
-                    stop_lander(LANDED); // Victory!
-                }
+            if (lander.x >= landingpad && edge <= landingpad+LANDINGPAD_WIDTH) {
+                stop_lander(LANDED); // Victory!
             }
-            lander.y = moon[lander.x]-LANDER_HEIGHT;
             return;
         } else { // Uneven ground, 
-            if (lander.speed.y > IMPACT_MAX) {
-                lander.bitmap = img_downcrash;
-                stop_lander(CRASHED);
-                lander.y = max-LANDER_HEIGHT;
-                return;
-            } else {
-                lander.speed.y = -1*lander.speed.y/2;
-                if (lander.speed.y == 0 && lander.fuel == 0) {
-                    stop_lander(STRANDED);
-                }
+            lander.speed.y = -1*lander.speed.y/2;
+            if (lander.speed.y == 0 && lander.fuel == 0) {
+                stop_lander(STRANDED);
             }
         }
     }
@@ -126,7 +119,7 @@ void apply_input(void)
     union keyrow_0 k0;
     static union keyrow_0 prev_k0 = {.raw = 0};
 
-    if (!lander.freedom.stopped) {
+    if (!lander.freedom.stopped && lander.fuel > 0) {
         scan_row_6(&k6);
     } else {
         k6.raw = 0;
@@ -164,12 +157,9 @@ void apply_input(void)
         lander.thrust.hn_stage = 0;
     }
 
-    if (k6.keys.K_LEFT && k6.keys.K_RIGHT) {
-        lander.acceleration.x = 0;
-    }
-    if (!k6.keys.K_LEFT && !k6.keys.K_RIGHT) {
-        lander.acceleration.x = 0;
-    }
+    // If both keys are pressed, cancel each acceleration
+    // (without cancelling fuel consumption)
+    lander.acceleration.x *= (k6.keys.K_LEFT ^ k6.keys.K_RIGHT);
 
     if (k6.keys.K_UP) {
         if (lander.acceleration.y > -ACCEL_MAX && lander.y > 0) {
