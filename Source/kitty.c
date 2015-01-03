@@ -22,7 +22,7 @@ void init_kitty(void)
 
 void draw_kitty(void)
 {
-    draw_live_sprite(*kitty.bitmap, kitty.stage, kitty.x, kitty.y, 0);
+    draw_live_sprite(*kitty.bitmap, kitty.stage, kitty.x, kitty.y, 0, OR);
 }
 
 void move_kitty(void)
@@ -41,7 +41,7 @@ void move_kitty(void)
 
     // Cat state machine
     if (kitty.state == SITTING) { // Initial state
-        if (lander.x == kitty.x || lander.crashed || lander.landed) {
+        if (lander.x == kitty.x || lander.freedom.stopped) {
             nextstate = SITTING;
         } else if (lander.x+LANDER_WIDTH < kitty.x) {
             nextstate = RUNNING_LEFT;
@@ -59,7 +59,7 @@ void move_kitty(void)
         } else if (kitty.x > scratch) {
             nextstate = RUNNING_LEFT;
         } else if (scratch > kitty.x) {
-            if (lander.crashed || lander.landed) {
+            if (lander.freedom.stopped) {
                 nextstate = SITTING;
             } else {
                 nextstate = JUMPING_LEFT;
@@ -74,7 +74,7 @@ void move_kitty(void)
         } else if (kitty.x < scratch) {
             nextstate = RUNNING_RIGHT;
         } else if (scratch < kitty.x) {
-            if (lander.crashed || lander.landed) {
+            if (lander.freedom.stopped) {
                 nextstate = SITTING;
             } else {
                 nextstate = JUMPING_RIGHT;

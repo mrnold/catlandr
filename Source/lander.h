@@ -28,9 +28,14 @@ struct lander_t {
         unsigned char vp_stage   : 2; // Vertical positive (screen down)
         unsigned char vp_firing  : 1;
     } thrust;
-    unsigned char crashed;
-    unsigned char landed;
-    unsigned char stranded;
+    union {
+        struct {
+            unsigned char stranded : 1;
+            unsigned char crashed : 1;
+            unsigned char landed : 1;
+        } stuck;
+        unsigned char stopped;
+    } freedom;
     const unsigned char *bitmap;
     unsigned char fuel;
     unsigned char food;

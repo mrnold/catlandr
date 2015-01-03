@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "kibble.h"
 #include "kitty.h"
 #include "lander.h"
 #include "misc.h"
@@ -26,35 +27,32 @@ void init_lander(void)
     lander.thrust.hn_firing = 0;
     lander.thrust.vp_stage = 0;
     lander.thrust.vp_firing = 0;
-    lander.stranded = false;
-    lander.crashed = false;
-    lander.landed = false;
+    lander.freedom.stopped = false;
     lander.fuel = 255;
-    lander.food = 31;
+    lander.food = KIBBLE_MAX;
 }
 
 void stop_lander(unsigned char state)
 {
+    lander.freedom.stopped = false;
     switch (state) {
         case STRANDED:
-            lander.stranded = true;
-            lander.crashed = false;
-            lander.landed = false;
+            lander.freedom.stuck.stranded = true;
             break;
         case CRASHED:
-            lander.stranded = false;
-            lander.crashed = true;
-            lander.landed = false;
+            lander.freedom.stuck.crashed = true;
             break;
         case LANDED:
-            lander.stranded = false;
-            lander.crashed = false;
-            lander.landed = true;
+            lander.freedom.stuck.landed = true;
             break;
     }
     lander.thrust.hp_firing = false;
     lander.thrust.hn_firing = false;
     lander.thrust.vp_firing = false;
+    lander.acceleration.x = 0;
+    lander.acceleration.y = 0;
+    lander.speed.x = 0;
+    lander.speed.y = 0;
     running = false;
     menu = true;
 }
@@ -70,7 +68,7 @@ void move_lander(void)
     lander.previous.y = lander.y;
     previouscamera = camera;
 
-    if (lander.crashed) {
+    if (lander.freedom.stuck.crashed) {
         kitty.bitmap = &cat_sittingleft;
         kitty.batting = false;
         return;
@@ -177,14 +175,14 @@ void draw_lander(void)
     draw_static_sprite_noclip(lander.bitmap, lander.x, lander.y);
 
     if (lander.thrust.hp_firing) { // Draw left thruster
-        draw_live_sprite(img_thrustleft, lander.thrust.hp_stage, lander.x, lander.y, -8);
+        draw_live_sprite(img_thrustleft, lander.thrust.hp_stage, lander.x, lander.y, -8, OR);
     }
 
     if (lander.thrust.hn_firing) { // Draw right thruster
-        draw_live_sprite(img_thrustright, lander.thrust.hn_stage, lander.x, lander.y, 8);
+        draw_live_sprite(img_thrustright, lander.thrust.hn_stage, lander.x, lander.y, 8, OR);
     }
 
     if (lander.thrust.vp_firing) {
-        draw_live_sprite(img_thrustdown, lander.thrust.vp_stage, lander.x, lander.y+8, 0);
+        draw_live_sprite(img_thrustdown, lander.thrust.vp_stage, lander.x, lander.y+8, 0, OR);
     }
 }
