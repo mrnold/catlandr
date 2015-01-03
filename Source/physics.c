@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "kibble.h"
 #include "lander.h"
 #include "misc.h"
 #include "moon.h"
@@ -17,7 +18,6 @@ void init_physics(void)
     camera = 0;
     t = 0;
 }
-
 
 // Note: do this before drawing the lander, but after applying physics
 void collisions(void)
@@ -50,20 +50,12 @@ void collisions(void)
                 }
             }
             lander.y = moon[lander.x]-LANDER_HEIGHT;
-            lander.acceleration.x = 0;
-            lander.acceleration.y = 0;
-            lander.speed.x = 0;
-            lander.speed.y = 0;
             return;
         } else { // Uneven ground, 
             if (lander.speed.y > IMPACT_MAX) {
                 lander.bitmap = img_downcrash;
                 stop_lander(CRASHED);
                 lander.y = max-LANDER_HEIGHT;
-                lander.acceleration.x = 0;
-                lander.acceleration.y = 0;
-                lander.speed.x = 0;
-                lander.speed.y = 0;
                 return;
             } else {
                 lander.speed.y = -1*lander.speed.y/2;
@@ -88,10 +80,6 @@ void collisions(void)
                     stop_lander(CRASHED);
                     lander.x = i-LANDER_WIDTH;
                     lander.y = lander.previous.y;
-                    lander.acceleration.x = 0;
-                    lander.acceleration.y = 0;
-                    lander.speed.x = 0;
-                    lander.speed.y = 0;
                     camera = previouscamera;
                     return;
                 } else {
@@ -117,10 +105,6 @@ void collisions(void)
                     stop_lander(CRASHED);
                     lander.x = i;
                     lander.y = lander.previous.y;
-                    lander.acceleration.x = 0;
-                    lander.acceleration.y = 0;
-                    lander.speed.x = 0;
-                    lander.speed.y = 0;
                     camera = previouscamera;
                     return;
                 } else {
@@ -140,8 +124,9 @@ void apply_input(void)
 {
     union keyrow_6 k6;
     union keyrow_0 k0;
+    static union keyrow_0 prev_k0 = {.raw = 0};
 
-    if (!lander.crashed && !lander.landed && lander.fuel > 0) {
+    if (!lander.freedom.stopped) {
         scan_row_6(&k6);
     } else {
         k6.raw = 0;
@@ -198,11 +183,16 @@ void apply_input(void)
             }
         }
     } else {
-        if (!lander.crashed) {
+        if (!lander.freedom.stuck.crashed) {
             lander.acceleration.y = GRAVITY;
         }
         lander.thrust.vp_firing = false;
         lander.thrust.vp_stage = 0;
+    }
+
+    if (k0.keys.K_2ND && !prev_k0.keys.K_2ND && lander.food > 0) {
+        lander.food--;
+        create_kibble(lander.food, lander.x, lander.y, lander.speed.x, lander.speed.y);
     }
 
     if (k0.keys.K_EXIT) {
@@ -213,4 +203,6 @@ void apply_input(void)
         running = false;
         menu = true;
     }
+
+    prev_k0.raw = k0.raw;
 }

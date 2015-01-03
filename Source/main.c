@@ -1,6 +1,7 @@
 #include "bitmap.h"
 #include "lander.h"
 #include "lock.h"
+#include "kibble.h"
 #include "kitty.h"
 #include "misc.h"
 #include "moon.h"
@@ -16,7 +17,6 @@ unsigned char menu;
 void init(void);
 void reset(void);
 void showmenu(void);
-void perfcheck(void);
 void gamesequence(void);
 void menusequence(void);
 void timer_callback(void);
@@ -64,12 +64,11 @@ int main(void)
             drop_lock(frame_lock);
 
             if (running) {
-                perfcheck();
                 while (is_locked(idle_lock)) {
                     idle();
                 }
             } else {
-                if (lander.crashed || lander.landed || lander.stranded) {
+                if (lander.freedom.stopped) {
                     menu = true;
                 }
             }
@@ -88,12 +87,14 @@ void force_call(void)
 void gamesequence(void)
 {
     apply_input();
+    move_kibbles();
     move_kitty();
     move_lander();
     collisions();
     draw_moon();
     draw_lander();
     draw_kitty();
+    draw_kibbles();
     draw_status();
     screencopy();
     force_call();
@@ -104,6 +105,7 @@ void menusequence(void)
     draw_moon();
     draw_lander();
     draw_kitty();
+    draw_kibbles();
     screencopy();
 }
 
@@ -113,6 +115,7 @@ void reset(void)
     frames = 0;
     dropped = 0;
 
+    init_kibbles();
     init_kitty();
     init_lander();
     init_moon();
@@ -134,17 +137,11 @@ void timer_callback(void)
     ticks++;
 }
 
-void perfcheck(void)
-{
-    if (frames == 1000) {
-        running = false;
-    }
-}
-
 void menu_input(void)
 {
     union keyrow_0 k0;
     union keyrow_6 k6;
+    static union keyrow_6 prev_k6 = {.raw = 0};
 
     scan_row_0(&k0);
     scan_row_6(&k6);
@@ -154,7 +151,7 @@ void menu_input(void)
         menu = false;
     }
 
-    if (k6.raw && !lander.landed && !lander.crashed && !lander.stranded) {
+    if (k6.raw && !prev_k6.raw && !lander.freedom.stopped) {
         running = true;
         menu = false;
     }
@@ -164,6 +161,8 @@ void menu_input(void)
         menusequence();
         showmenu();
     }
+
+    prev_k6.raw = k6.raw;
 }
 
 void showmenu(void)
@@ -174,12 +173,12 @@ void showmenu(void)
     printxy(0, 18, "2ND to drop a kibble");
     printxy(0, 24, "Arrow keys for thrusters");
 
-    if (lander.crashed) {
+    if (lander.freedom.stuck.crashed) {
         printxy(87, 6, "Lander");
         printxy(91, 12, "destroyed!");
-    } else if (lander.stranded) {
+    } else if (lander.freedom.stuck.stranded) {
         printxy(80, 6, "Out of fuel!");
-    } else if (lander.landed) {
+    } else if (lander.freedom.stuck.landed) {
         printxy(80, 6, "Safe landing!");
     } else {
         printxy(89, 0,  "Land safely");
