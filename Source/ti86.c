@@ -90,15 +90,15 @@ void set_timer(void)
         di
         ld bc, #3
         ld hl, #jump_timer
-        ld de, #0xf8f8
+        ld de, #0xadad
         ldir
 
-        ld hl, #0xf900
-        ld de, #0xf901
-        ld (hl), #0xf8
+        ld hl, #0xae00
+        ld de, #0xae01
+        ld (hl), #0xad
         ld bc, #256
         ldir
-        ld a, #0xf9
+        ld a, #0xae
         ld i, a
         im 2
         ei
@@ -188,7 +188,7 @@ void prerender(void)
     for (j = 0; j < (MOON_WIDTH-1); j++) {
         height = moon[j];
         for (i = height; i < SCREEN_HEIGHT; i++) {
-            prerendered[i][j/8] |= (0x80 >> (j%8));
+            prerendered[i][j>>3] |= (0x80 >> (j&0x07));
         }
     }
 }
@@ -418,8 +418,8 @@ void draw_moon(void)
 void draw_status(void)
 {
     unsigned char i;
-    unsigned char x = lander.fuel/(SCREEN_WIDTH/8);
-    unsigned char shift = (lander.fuel/2)%8;
+    unsigned char x = lander.fuel>>4;
+    unsigned char shift = (lander.fuel>>1)&0x07;
 
     if (lander.fuel == 0) {
         return;
@@ -433,14 +433,15 @@ void draw_status(void)
 // Only for sprites guaranteed to be fully onscreen
 void draw_static_sprite_noclip(const unsigned char image[8], unsigned short x, unsigned char y)
 {
-    unsigned char i, rshift, lshift, localx;
+    unsigned int yoffset = y<<4;
+    unsigned char i, rshift, lshift, screenx;
     unsigned char *screenbyte;
     unsigned int start;
 
-    localx = x-camera;
-    rshift = localx%8;
+    screenx = x-camera;
+    rshift = screenx&0x07;
     lshift = 8-rshift;
-    start = localx/8+y*16;
+    start = (screenx>>3)+yoffset;
     screenbyte = (unsigned char *)screenbuffer+start;
     for (i = 0; i < 8; i++) {
         *screenbyte |= (image[i] >> rshift);
@@ -454,7 +455,7 @@ void draw_live_sprite(const unsigned char animation[8][4],
         unsigned char frame, unsigned short x, unsigned char y,
         char offset, char mode)
 {
-    unsigned int yoffset = y*16;
+    unsigned int yoffset = y<<4;
 
     unsigned char i, rshift, lshift, imgbyte, *screenbyte, screenx;
     unsigned int start;
@@ -467,9 +468,9 @@ void draw_live_sprite(const unsigned char animation[8][4],
     scratch = x-camera+offset;
     screenx = (unsigned char)scratch;
 
-    rshift = screenx%8;
+    rshift = screenx&0x07;
     lshift = 8-rshift;
-    start = screenx/8+yoffset;
+    start = (screenx>>3)+yoffset;
 
     screenbyte = (unsigned char *)screenbuffer+start;
     if (scratch >= 0 && scratch <= SCREEN_WIDTH-8) {

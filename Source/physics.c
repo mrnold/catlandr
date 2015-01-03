@@ -52,7 +52,7 @@ void collisions(void)
             }
             return;
         } else { // Uneven ground, 
-            lander.speed.y = -1*lander.speed.y/2;
+            lander.speed.y = -1*(lander.speed.y>>1);
             if (lander.speed.y == 0 && lander.fuel == 0) {
                 stop_lander(STRANDED);
             }
@@ -78,7 +78,7 @@ void collisions(void)
                 } else {
                     lander.x = lander.previous.x;
                     lander.acceleration.x = 0;
-                    lander.speed.x = -1*lander.speed.x/2;
+                    lander.speed.x = -1*(lander.speed.x>>1);
                     if (lander.speed.x > -1) {
                         lander.speed.x = -1; // Bounce!
                     }
@@ -103,7 +103,7 @@ void collisions(void)
                 } else {
                     lander.x = edge;
                     lander.acceleration.x = 0;
-                    lander.speed.x = -1*lander.speed.x/2;
+                    lander.speed.x = -1*(lander.speed.x>>1);
                     if (lander.speed.x < 1) {
                         lander.speed.x = 1; // Bounce!
                     }
@@ -131,7 +131,7 @@ void apply_input(void)
             lander.acceleration.x++;
         }
         lander.thrust.hp_firing = true;
-        if (t%4 == 0) { // Cycle ~6 times/sec
+        if ((t&0x03) == 0) { // Cycle ~6 times/sec
             lander.thrust.hp_stage++;
             if (lander.fuel != 0) {
                 lander.fuel--;
@@ -146,7 +146,7 @@ void apply_input(void)
             lander.acceleration.x--;
         }
         lander.thrust.hn_firing = true;
-        if (t%4 == 0) {
+        if ((t&0x03) == 0) {
             lander.thrust.hn_stage++;
             if (lander.fuel != 0) {
                 lander.fuel--;
@@ -166,7 +166,7 @@ void apply_input(void)
             lander.acceleration.y--;
         }
         lander.thrust.vp_firing = true;
-        if (t%4 == 0) {
+        if ((t&0x03) == 0) {
             lander.thrust.vp_stage++;
             if (lander.fuel != 0) {
                 lander.fuel--;
