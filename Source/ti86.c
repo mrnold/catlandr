@@ -429,3 +429,66 @@ void draw_status(void)
     }
     *(((unsigned char *)screenbuffer)+i) |= ((char)0x80 >> shift);
 }
+
+// Only for sprites guaranteed to be fully onscreen
+void draw_static_sprite_noclip(const unsigned char image[8], unsigned short x, unsigned char y)
+{
+    unsigned char i, rshift, lshift, localx;
+    unsigned char *screenbyte;
+    unsigned int start;
+
+    localx = x-camera;
+    rshift = localx%8;
+    lshift = 8-rshift;
+    start = localx/8+y*16;
+    screenbyte = (unsigned char *)screenbuffer+start;
+    for (i = 0; i < 8; i++) {
+        *screenbyte |= (image[i] >> rshift);
+        *(screenbyte+1) |= (image[i] << lshift);
+        screenbyte += 16;
+    }
+}
+
+// World x, not screen x.
+void draw_live_sprite(const unsigned char animation[8][4],
+        unsigned char frame, unsigned short x, unsigned char y)
+{
+    const unsigned int yoffset = y*16;
+
+    unsigned char i, rshift, lshift, imgbyte, *screenbyte, screenx;
+    unsigned int start;
+    int scratch;
+
+    if (x > camera+SCREEN_WIDTH || x+8 < camera) {
+        return;
+    }
+
+    scratch = x-camera;
+    screenx = (unsigned char)scratch;
+
+    rshift = screenx%8;
+    lshift = 8-rshift;
+    start = screenx/8+yoffset;
+
+    screenbyte = (unsigned char *)screenbuffer+start;
+    if (scratch >= 0 && scratch < SCREEN_WIDTH-8) {
+        for (i = 0; i < 8; i++) {
+            imgbyte = animation[i][frame];
+            *screenbyte |= (imgbyte >> rshift);
+            *(screenbyte+1) |= (imgbyte << lshift);
+            screenbyte += 16;
+        }
+    } else if (scratch < 0 && scratch > -8) {
+        for (i = 0; i < 8; i++) {
+            imgbyte = animation[i][frame];
+            *(screenbyte) |= (imgbyte << lshift);
+            screenbyte += 16;
+        }
+    } else if (scratch >= 0 && scratch < SCREEN_WIDTH) {
+        for (i = 0; i < 8; i++) {
+            imgbyte = animation[i][frame];
+            *screenbyte |= (imgbyte >> rshift);
+            screenbyte += 16;
+        }
+    }
+}

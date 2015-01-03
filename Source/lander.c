@@ -174,76 +174,17 @@ void move_lander(void)
 
 void draw_lander(void)
 {
-    const unsigned int yoffset = lander.y*16;
-    const unsigned char landerx = (unsigned char)(lander.x-camera);
+    draw_static_sprite_noclip(lander.bitmap, lander.x, lander.y);
 
-    unsigned char i, y, x, rshift, lshift, imgbyte, *screenbyte;
-    unsigned int start;
-
-    rshift = landerx%8;
-    lshift = 8-rshift;
-    start = landerx/8+yoffset;
-    screenbyte = (unsigned char *)screenbuffer+start;
-    for (i = 0; i < LANDER_HEIGHT; i++) {
-        *screenbyte |= (lander.bitmap[i] >> rshift);
-        *(screenbyte+1) |= (lander.bitmap[i] << lshift);
-        screenbyte += 16;
+    if (lander.thrust.hp_firing) { // Draw left thruster
+        draw_live_sprite(img_thrustleft, lander.thrust.hp_stage, lander.x-8, lander.y);
     }
 
-    if (lander.thrust.hp_firing && landerx > 0) { // Draw left thruster
-        x = landerx-LANDER_WIDTH;
-        rshift = x%8;
-        lshift = 8-rshift;
-        start = x/8+yoffset;
-        screenbyte = (unsigned char *)screenbuffer+start;
-        if (landerx >= LANDER_WIDTH) {
-            for (i = 0; i < LANDER_HEIGHT; i++) {
-                imgbyte = img_thrustleft[i][lander.thrust.hp_stage];
-                *screenbyte |= (imgbyte >> rshift);
-                *(screenbyte+1) |= (imgbyte << lshift);
-                screenbyte += 16;
-            }
-        } else {
-            for (i = 0; i < LANDER_HEIGHT; i++) {
-                imgbyte = img_thrustleft[i][lander.thrust.hp_stage];
-                *(screenbyte+1) |= (imgbyte << lshift);
-                screenbyte += 16;
-            }
-        }
-    }
-
-    x = landerx+LANDER_WIDTH;
-    if (lander.thrust.hn_firing && x < SCREEN_WIDTH) { // Draw right thruster
-        rshift = x%8;
-        lshift = 8-rshift;
-        start = x/8+yoffset;
-        screenbyte = (unsigned char *)screenbuffer+start;
-        if (x < SCREEN_WIDTH-LANDER_WIDTH) {
-            for (i = 0; i < LANDER_HEIGHT; i++) {
-                imgbyte = img_thrustright[i][lander.thrust.hn_stage];
-                *screenbyte |= (imgbyte >> rshift);
-                *(screenbyte+1) |= (imgbyte << lshift);
-                screenbyte += 16;
-            }
-        } else {
-            for (i = 0; i < LANDER_HEIGHT; i++) {
-                imgbyte = img_thrustright[i][lander.thrust.hn_stage];
-                *screenbyte |= (imgbyte >> rshift);
-                screenbyte += 16;
-            }
-        }
+    if (lander.thrust.hn_firing) { // Draw right thruster
+        draw_live_sprite(img_thrustright, lander.thrust.hn_stage, lander.x+8, lander.y);
     }
 
     if (lander.thrust.vp_firing) {
-        y = lander.y+LANDER_HEIGHT;
-        rshift = landerx%8;
-        start = landerx/8+y*16;
-        screenbyte = (unsigned char *)screenbuffer+start;
-        for (i = 0; i < LANDER_HEIGHT; i++) {
-            imgbyte = img_thrustdown[i][lander.thrust.vp_stage];
-            *screenbyte ^= (imgbyte >> rshift);
-            *(screenbyte+1) ^= (imgbyte << lshift);
-            screenbyte += 16;
-        }
+        draw_live_sprite(img_thrustdown, lander.thrust.vp_stage, lander.x, lander.y+8);
     }
 }

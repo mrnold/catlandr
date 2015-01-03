@@ -22,46 +22,7 @@ void init_kitty(void)
 
 void draw_kitty(void)
 {
-    const unsigned int yoffset = kitty.y*16;
-
-    unsigned char i, rshift, lshift, imgbyte, *screenbyte, kittyx;
-    unsigned int start;
-    int scratch;
-
-    if (kitty.x > camera+SCREEN_WIDTH || kitty.x+KITTY_WIDTH < camera) {
-        return;
-    }
-
-    scratch = kitty.x-camera;
-    kittyx = (unsigned char)scratch;
-
-    rshift = kittyx%8;
-    lshift = 8-rshift;
-    start = kittyx/8+yoffset;
-
-    if (scratch >= 0 && scratch < SCREEN_WIDTH-KITTY_WIDTH) {
-        screenbyte = (unsigned char *)screenbuffer+start;
-        for (i = 0; i < KITTY_HEIGHT; i++) {
-            imgbyte = (*kitty.bitmap)[i][kitty.stage];
-            *screenbyte |= (imgbyte >> rshift);
-            *(screenbyte+1) |= (imgbyte << lshift);
-            screenbyte += 16;
-        }
-    } else if (scratch < 0 && scratch > -KITTY_WIDTH) {
-        screenbyte = (unsigned char *)screenbuffer+yoffset;
-        for (i = 0; i < KITTY_HEIGHT; i++) {
-            imgbyte = (*kitty.bitmap)[i][kitty.stage];
-            *(screenbyte) |= (imgbyte << lshift);
-            screenbyte += 16;
-        }
-    } else if (scratch >= 0 && scratch < SCREEN_WIDTH) {
-        screenbyte = (unsigned char *)screenbuffer+start;
-        for (i = 0; i < KITTY_HEIGHT; i++) {
-            imgbyte = (*kitty.bitmap)[i][kitty.stage];
-            *screenbyte |= (imgbyte >> rshift);
-            screenbyte += 16;
-        }
-    }
+    draw_live_sprite(*kitty.bitmap, kitty.stage, kitty.x, kitty.y);
 }
 
 void move_kitty(void)
