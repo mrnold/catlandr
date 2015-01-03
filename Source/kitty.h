@@ -6,6 +6,8 @@ enum kitty_states {
     RUNNING_LEFT,
     JUMPING_LEFT,
     JUMPING_RIGHT,
+    SNACKING_RIGHT,
+    SNACKING_LEFT,
     SITTING
 };
 

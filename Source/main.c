@@ -129,7 +129,7 @@ void reset(void)
 void timer_callback(void)
 {
     if (ticks%8 == 0) {
-        if (is_locked(frame_lock)) {
+        if (!menu && running && is_locked(frame_lock)) {
             dropped++;
         }
         drop_lock(idle_lock);

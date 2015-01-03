@@ -88,9 +88,11 @@ void move_lander(void)
                 lander.speed.y += kitty.speed.y;
             }
         }
+    } else {
+        kitty.batting = false;
     }
 
-    lander.speed.x += lander.acceleration.x/2;
+    lander.speed.x += (lander.acceleration.x>>1);
     if (lander.speed.x > 0) {
         if (lander.speed.x > SPEED_MAX) {
             lander.speed.x = SPEED_MAX;
@@ -137,7 +139,7 @@ void move_lander(void)
     }
 
 
-    lander.speed.y += lander.acceleration.y/2;
+    lander.speed.y += (lander.acceleration.y>>1);
     if (lander.speed.y > SPEED_MAX) {
         lander.speed.y = SPEED_MAX;
     } else if (lander.speed.y < -SPEED_MAX) {
@@ -145,14 +147,14 @@ void move_lander(void)
     }
 
     if (lander.speed.y > 0) { //Screen down
-        lander.y += lander.speed.y/4;
+        lander.y += (lander.speed.y>>2);
         if (lander.y > (SCREEN_HEIGHT-LANDER_HEIGHT)) {
             lander.y = (SCREEN_HEIGHT-LANDER_HEIGHT);
             lander.speed.y = 0;
             lander.acceleration.y = 0;
         }
     } else if (lander.speed.y < 0) { //Screen up
-        scratch = lander.y + lander.speed.y/4;
+        scratch = lander.y + (lander.speed.y>>2);
         if (scratch < 0) {
             lander.y = 0;
             lander.speed.y = 0;

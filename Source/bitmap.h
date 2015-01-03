@@ -15,5 +15,7 @@ extern const unsigned char cat_runleft[][CAT_RUNSTAGES];
 extern const unsigned char cat_runright[][CAT_RUNSTAGES];
 extern const unsigned char cat_sittingleft[][CAT_RUNSTAGES];
 extern const unsigned char cat_sittingright[][CAT_RUNSTAGES];
+extern const unsigned char cat_snackingleft[][CAT_RUNSTAGES];
+extern const unsigned char cat_snackingright[][CAT_RUNSTAGES];
 
 extern const unsigned char kibble[][KIBBLE_FALLSTAGES];
