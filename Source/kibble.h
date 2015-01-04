@@ -21,4 +21,4 @@ void move_kibbles(void);
 void create_kibble(unsigned char, unsigned short, unsigned char, char, char);
 struct kibble_t *find_kibbles(unsigned short);
 
-extern struct kibble_t kibbles[KIBBLE_MAX];
+extern __at (0xa600) struct kibble_t kibbles[KIBBLE_MAX];

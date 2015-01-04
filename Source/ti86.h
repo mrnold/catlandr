@@ -2,7 +2,10 @@
 #define SCREEN_HEIGHT 64
 
 extern __at (0x8100) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
-extern __at (0xb000) unsigned char screenbuffer[SCREEN_HEIGHT][SCREEN_WIDTH/8];
+extern __at (0xca00) unsigned char screenbuffer1[SCREEN_HEIGHT][SCREEN_WIDTH/8];
+extern __at (0xfc00) unsigned char screenbuffer2[SCREEN_HEIGHT][SCREEN_WIDTH/8];
+extern __at (0xb000) unsigned char *backupgraph;
+extern unsigned char *screenbuffer;
 
 union keyrow_0 {
     struct {
@@ -52,3 +55,6 @@ void printxy(unsigned char, unsigned char, const char * const);
 void draw_status(void);
 void draw_live_sprite(const unsigned char [8][4], unsigned char, unsigned short, unsigned char, char, char);
 void draw_static_sprite_noclip(const unsigned char image[8], unsigned short x, unsigned char y);
+void save_graphbuffer(void) __naked;
+void restore_graphbuffer(void) __naked;
+void flipscreen(void);

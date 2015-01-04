@@ -8,10 +8,16 @@ static unsigned short r16;
 static void (*callback_function)(void);
 
 __at (0x8100) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
-__at (0xb000) unsigned char screenbuffer[SCREEN_HEIGHT][SCREEN_WIDTH/8];
+__at (0xca00) unsigned char screenbuffer1[SCREEN_HEIGHT][SCREEN_WIDTH/8];
+__at (0xfc00) unsigned char screenbuffer2[SCREEN_HEIGHT][SCREEN_WIDTH/8];
+__at (0xb000) unsigned char *backupgraph;
 
 __at (0xc37c) unsigned char textcol;
 __at (0xc37d) unsigned char textrow;
+
+unsigned char *screenbuffer = 0xca00;
+
+__sfr __at 0x00 lcdptr;
 
 void printxy(unsigned char col, unsigned char row, const char * const string)
 {
@@ -32,6 +38,56 @@ void idle(void) __naked
     __asm
         ei
         halt
+        ret
+    __endasm;
+}
+
+void flipscreen(void)
+{
+    if (screenbuffer == (unsigned char *)0xfc00) {
+        screenbuffer = (unsigned char *)0xca00;
+        lcdptr = 0x3c;
+    } else {
+        screenbuffer = (unsigned char *)0xfc00;
+        lcdptr = 0x0a;
+    }
+}
+
+void save_graphbuffer(void) __naked
+{
+    __asm
+        push af
+        push bc
+        push de
+        push hl
+        ld bc, #0x0400
+        ld de, #0xb000
+        ld hl, #0xca00
+        ldir
+        pop hl
+        pop de
+        pop bc
+        pop af
+        ret
+    __endasm;
+}
+
+void restore_graphbuffer(void) __naked
+{
+    lcdptr = 0x3c;
+    __asm
+        push af
+        push bc
+        push de
+        push hl
+        ld bc, #0x0400
+        ld de, #0xca00
+        ld hl, #0xb000
+        ldir
+        pop hl
+        pop de
+        pop bc
+        pop af
         ret
     __endasm;
 }
@@ -152,7 +208,7 @@ void screencopy(void) __naked
         push bc
         push de
         push hl
-        ld hl, #_screenbuffer
+        ld hl, (#_screenbuffer)
         ld de, #0xfc00
         ld bc, #1024
         ldir
@@ -264,7 +320,7 @@ void draw_moon(void) __naked
         add hl, de
         ex de, hl ;// de = prerendered+prex
 
-        ld bc, #_screenbuffer ;// bc now scr
+        ld bc, (#_screenbuffer) ;// bc now scr
 
     fdm_loop: ;// Want (bc) = (de)
 
@@ -311,8 +367,11 @@ void draw_moon(void) __naked
 
         ;// inc de Aldready taken care of
         inc bc
-        bit 2, b ;// bc (scr) = screenbuf+1024? Must be aligned with _at!!!
-        jp nz, fdm_loop_done
+        ld a, #0xce
+        cp b ;// bc (scr) = screenbuf+1024? Must be aligned with _at!!!
+        jp z, fdm_loop_done
+        and b
+        jp z, fdm_loop_done
         ld a, #0x0f
         and c ;// multiples of 16: de (pre) needs to make a big jump to next row. use _at!
         jp nz, fdm_loop
@@ -425,9 +484,9 @@ void draw_status(void)
         return;
     }
     for (i = 0; i < x; i++) {
-        *(((unsigned char *)screenbuffer)+i) = 0xff;
+        *(screenbuffer+i) = 0xff;
     }
-    *(((unsigned char *)screenbuffer)+i) |= ((char)0x80 >> shift);
+    *(screenbuffer+i) |= ((char)0x80 >> shift);
 }
 
 // Only for sprites guaranteed to be fully onscreen
@@ -442,7 +501,7 @@ void draw_static_sprite_noclip(const unsigned char image[8], unsigned short x, u
     rshift = screenx&0x07;
     lshift = 8-rshift;
     start = (screenx>>3)+yoffset;
-    screenbyte = (unsigned char *)screenbuffer+start;
+    screenbyte = screenbuffer+start;
     for (i = 0; i < 8; i++) {
         *screenbyte |= (image[i] >> rshift);
         *(screenbyte+1) |= (image[i] << lshift);
@@ -472,7 +531,7 @@ void draw_live_sprite(const unsigned char animation[8][4],
     lshift = 8-rshift;
     start = (screenx>>3)+yoffset;
 
-    screenbyte = (unsigned char *)screenbuffer+start;
+    screenbyte = screenbuffer+start;
     if (scratch >= 0 && scratch <= SCREEN_WIDTH-8) {
         for (i = 0; i < 8; i++) {
             imgbyte = animation[i][frame];
@@ -486,7 +545,7 @@ void draw_live_sprite(const unsigned char animation[8][4],
             screenbyte += 16;
         }
     } else if (scratch < 0 && scratch > -8) {
-        screenbyte = (unsigned char *)screenbuffer+yoffset;
+        screenbyte = screenbuffer+yoffset;
         for (i = 0; i < 8; i++) {
             imgbyte = animation[i][frame];
             if (mode == OR) {
@@ -508,3 +567,4 @@ void draw_live_sprite(const unsigned char animation[8][4],
         }
     }
 }
+
