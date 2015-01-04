@@ -5,7 +5,7 @@
 #include "physics.h"
 #include "ti86.h"
 
-struct kibble_t kibbles[KIBBLE_MAX];
+__at (0xa600) struct kibble_t kibbles[KIBBLE_MAX];
 
 void init_kibbles(void)
 {

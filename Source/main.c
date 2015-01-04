@@ -42,6 +42,7 @@ void init(void)
 
 int main(void)
 {
+    save_graphbuffer();
     clear_screen();
     init();
     while (menu || running) {
@@ -76,6 +77,7 @@ int main(void)
     }
 
     clear_screen();
+    restore_graphbuffer();
     return 0;
 }
 
@@ -96,7 +98,7 @@ void gamesequence(void)
     draw_kitty();
     draw_kibbles();
     draw_status();
-    screencopy();
+    flipscreen();
     force_call();
 }
 
@@ -106,7 +108,7 @@ void menusequence(void)
     draw_lander();
     draw_kitty();
     draw_kibbles();
-    screencopy();
+    flipscreen();
 }
 
 void reset(void)
@@ -167,6 +169,9 @@ void menu_input(void)
 
 void showmenu(void)
 {
+    if (screenbuffer == (unsigned char *)0xfc00) {
+        menusequence();
+    }
     printxy(0, 0,  "EXIT to quit");
     printxy(0, 6,  "F1 for this menu");
     printxy(0, 12, "F2 for a new moon");
