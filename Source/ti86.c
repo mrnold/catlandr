@@ -126,10 +126,16 @@ void timer_isr(void) __naked
         ld hl, (#_callback_function)
         jp (hl)
     timer_isr_exit:
+        in a, (3) ;// TI-86 boilerplate
+        and #0x01 ;// Clear ON key status
+        add a, #0x09
+        out (3), a
+        ld a, #0x0b
+        out (3), a
         ex af, af'
         exx
         ei
-        ret
+        reti
     __endasm;
 }
 #pragma preproc_asm +
@@ -140,7 +146,7 @@ void setup_timer(void (*callback)(void))
     set_timer();
 }
 
-void set_timer(void)
+void set_timer(void) __naked
 {
     __asm
         di
@@ -253,7 +259,7 @@ void prerender(void)
 void draw_moon(void) __naked
 {
     __asm
-        push iy ;// shift amount
+        push ix ;// shift amount
         push bc ;// scr
         push de ;// pre
         push hl ;// temps
@@ -280,28 +286,28 @@ void draw_moon(void) __naked
         jp z, fdm_setup_loop_shift7
         jp fdm_setup_loop_done
     fdm_setup_loop_shift7:
-        ld iy, #fdm_loop_shift7
+        ld ix, #fdm_loop_shift7
         jp fdm_setup_loop_done
     fdm_setup_loop_shift6:
-        ld iy, #fdm_loop_shift6
+        ld ix, #fdm_loop_shift6
         jp fdm_setup_loop_done
     fdm_setup_loop_shift5:
-        ld iy, #fdm_loop_shift5
+        ld ix, #fdm_loop_shift5
         jp fdm_setup_loop_done
     fdm_setup_loop_shift4:
-        ld iy, #fdm_loop_shift4
+        ld ix, #fdm_loop_shift4
         jp fdm_setup_loop_done
     fdm_setup_loop_shift3:
-        ld iy, #fdm_loop_shift3
+        ld ix, #fdm_loop_shift3
         jp fdm_setup_loop_done
     fdm_setup_loop_shift2:
-        ld iy, #fdm_loop_shift2
+        ld ix, #fdm_loop_shift2
         jp fdm_setup_loop_done
     fdm_setup_loop_shift1:
-        ld iy, #fdm_loop_shift1
+        ld ix, #fdm_loop_shift1
         jp fdm_setup_loop_done
     fdm_setup_loop_shift0:
-        ld iy, #fdm_loop_shift0
+        ld ix, #fdm_loop_shift0
         ;jp fdm_setup_loop_done
     fdm_setup_loop_done:
 
@@ -329,7 +335,7 @@ void draw_moon(void) __naked
         inc de
         ld a, (de)
         ld l, a
-        jp (iy)
+        jp (ix)
 
     fdm_loop_shift7: ;// 22 beats 77
         ;// ld a, l
@@ -388,7 +394,7 @@ void draw_moon(void) __naked
         pop hl
         pop de
         pop bc
-        pop iy
+        pop ix
 
         ret
     __endasm;
