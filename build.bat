@@ -22,12 +22,11 @@ python Tools\ihxtobin.py Build\Source\main.ihx
 
 @rem Patch the binary to initialize globals. Usually SDCC expects this to be
 @rem done in the startup code, but this is not necessary on a TI.
-python Tools\trim.py Build\Source\main.c.map Build\Source\main.ihx.bin 0xD746
+python Tools\trim.py Build\Source\main.c.map Build\Source\main.ihx.bin 0xD748
+@copy /y Build\Source\main.ihx.bin Build\Source\catlandr.bin
+python Tools\binto86p.py Build\Source\catlandr.bin
 
-@rem Reminder: binpack8x.py patch: basepath, fnamein = os.path.split(fnamein)
-python Tools\binpac8x.py -6 -O LUNALNDR Build\Source\main.ihx.bin
-
-@copy /y Build\Source\main.86p luna.86p
+@copy /y Build\Source\catlandr.86p catlandr.86p
 @goto :done
 
 :compile
