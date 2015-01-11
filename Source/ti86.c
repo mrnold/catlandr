@@ -265,6 +265,28 @@ void draw_moon(void) __naked
         push hl ;// temps
         push af ;// math
 
+        ;// Fast clear upper portions of screen
+        ;// that are always zero: top 20 rows (0-19)
+        ld hl, (#_screenbuffer)
+        ld (hl), #0x00
+        ld de, (#_screenbuffer)
+        inc de
+        ld bc, #319 ;// 20 rows*16 bytes/row, minus the one byte already cleared
+        ldir
+
+        ;// Fast fill lower portions of screen
+        ;// that are always 0xff: bottom 8 rows (56-63)
+        ld hl, (#_screenbuffer)
+        ld de, #896 ;// 56th row
+        add hl, de
+        ld d, h
+        ld e, l
+        inc de
+        ld (hl), #0xff
+        ld bc, #127
+        ldir
+
+
         ld hl, #_camera
 
         ld a, #0x07
@@ -323,10 +345,16 @@ void draw_moon(void) __naked
         rr e ;// camera/8 in de
 
         ld hl, #_prerendered
+        ld bc, #2560 ;// 20 rows * 128 bytes/row from prerendered
+        add hl, bc
         add hl, de
         ex de, hl ;// de = prerendered+prex
 
-        ld bc, (#_screenbuffer) ;// bc now scr
+        ld bc, #320
+        ld hl, (#_screenbuffer)
+        add hl, bc
+        ld b, h
+        ld c, l ;// bc = screen offset that actually needs to get drawn
 
     fdm_loop: ;// Want (bc) = (de)
 
@@ -373,14 +401,22 @@ void draw_moon(void) __naked
 
         ;// inc de Aldready taken care of
         inc bc
-        ld a, #0xce
-        cp b ;// bc (scr) = screenbuf+1024? Must be aligned with _at!!!
+
+        ld a, #0x80
+        cp c
+        jr nz, fdm_loop_cont
+        ld a, #0xff
+        cp b
         jp z, fdm_loop_done
-        and b
+        ld a, #0xcd
+        cp b
         jp z, fdm_loop_done
+
+    fdm_loop_cont:
         ld a, #0x0f
         and c ;// multiples of 16: de (pre) needs to make a big jump to next row. use _at!
         jp nz, fdm_loop
+
         ld a, e
         add a, #0x70 ;// 128 to next row, (later) minus 16 for the loop incs
         ld e, a
