@@ -1,5 +1,4 @@
 void init_physics(void);
-void apply_input(void);
 void collisions(void);
 
 extern unsigned int previouscamera;
