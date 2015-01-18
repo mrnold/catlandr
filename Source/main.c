@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "game.h"
 #include "lander.h"
 #include "lock.h"
 #include "kibble.h"
@@ -39,22 +40,6 @@ void init(void)
     reset();
 }
 
-void loop_game(void)
-{
-    while (gamestate == GAME_RUNNING) {
-        wait_lock(idle_lock);
-        wait_lock(frame_lock);
-        gamesequence();
-        frames++;
-        t++; // This should be done after all physics calls are finished
-        drop_lock(frame_lock);
-
-        while (is_locked(idle_lock)) {
-            idle();
-        }
-    }
-}
-
 int main(void)
 {
     save_graphbuffer();
@@ -79,27 +64,6 @@ quit_program:
     clear_screen();
     restore_graphbuffer();
     return 0;
-}
-
-void force_call(void)
-{
-    moon;
-}
-
-void gamesequence(void)
-{
-    apply_input();
-    move_kibbles();
-    move_kitty();
-    move_lander();
-    collisions();
-    draw_moon();
-    draw_lander();
-    draw_kitty();
-    draw_kibbles();
-    draw_status();
-    flipscreen();
-    force_call();
 }
 
 void reset(void)
