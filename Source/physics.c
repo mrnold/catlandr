@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "game.h"
 #include "kibble.h"
 #include "lander.h"
 #include "misc.h"
@@ -9,7 +10,6 @@
 unsigned int t; // Time tick to be updated ~25 times/sec
 unsigned int camera;
 unsigned int previouscamera;
-extern unsigned char gamestate;
 
 void init_physics(void)
 {
