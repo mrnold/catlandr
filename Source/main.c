@@ -11,8 +11,7 @@
 unsigned int ticks;
 unsigned int frames;
 unsigned int dropped;
-unsigned char running;
-unsigned char menu;
+unsigned char gamestate;
 
 void init(void);
 void reset(void);
@@ -34,10 +33,50 @@ char *loading[] = {
 
 void init(void)
 {
-    menu = true;
-    running = false;
+    gamestate = START_MENU;
     printxy(0, 0, loading[random8()%4]);
     reset();
+}
+
+void loop_menu(void)
+{
+    menusequence();
+    showmenu();
+
+    while (true) {
+        switch (gamestate) {
+        case GAME_RESET:
+            init(); // Fall through to quit
+        case GAME_RUNNING:
+        case EXIT:
+            goto quit_menu;
+        default:
+            wait_lock(idle_lock);
+            menu_input();
+            while (is_locked(idle_lock)) {
+                idle();
+            }
+        }
+    }
+
+quit_menu:
+    return;
+}
+
+void loop_game(void)
+{
+    while (gamestate == GAME_RUNNING) {
+        wait_lock(idle_lock);
+        wait_lock(frame_lock);
+        gamesequence();
+        frames++;
+        t++; // This should be done after all physics calls are finished
+        drop_lock(frame_lock);
+
+        while (is_locked(idle_lock)) {
+            idle();
+        }
+    }
 }
 
 int main(void)
@@ -45,37 +84,22 @@ int main(void)
     save_graphbuffer();
     clear_screen();
     init();
-    while (menu || running) {
-        menusequence();
-        showmenu();
-        while (menu) {
-            wait_lock(idle_lock);
-            menu_input();
-            while (is_locked(idle_lock)) {
-                idle();
-            }
-        }
-
-        while (running) {
-            wait_lock(idle_lock);
-            wait_lock(frame_lock);
-            gamesequence();
-            frames++;
-            t++; // This should be done after all physics calls are finished
-            drop_lock(frame_lock);
-
-            if (running) {
-                while (is_locked(idle_lock)) {
-                    idle();
-                }
-            } else {
-                if (lander.freedom.stopped) {
-                    menu = true;
-                }
-            }
+    while (true) {
+        switch (gamestate) {
+            case DONE_STRANDED:
+            case DONE_CRASHED:
+            case DONE_LANDED:
+            case GAME_RESET:
+            case START_MENU:
+                loop_menu(); break;
+            case GAME_RUNNING:
+                loop_game(); break;
+            case EXIT:
+                goto quit_program;
         }
     }
 
+quit_program:
     clear_screen();
     restore_graphbuffer();
     return 0;
@@ -131,7 +155,7 @@ void reset(void)
 void timer_callback(void)
 {
     if (ticks%8 == 0) {
-        if (!menu && running && is_locked(frame_lock)) {
+        if (gamestate == GAME_RUNNING && is_locked(frame_lock)) {
             dropped++;
         }
         drop_lock(idle_lock);
@@ -149,19 +173,15 @@ void menu_input(void)
     scan_row_6(&k6);
 
     if (k0.keys.K_EXIT) {
-        running = false;
-        menu = false;
+        gamestate = EXIT;
     }
 
     if (k6.raw && !prev_k6.raw && !lander.freedom.stopped) {
-        running = true;
-        menu = false;
+        gamestate = GAME_RUNNING;
     }
 
     if (k0.keys.K_F2) {
-        init();
-        menusequence();
-        showmenu();
+        gamestate = GAME_RESET;
     }
 
     prev_k6.raw = k6.raw;

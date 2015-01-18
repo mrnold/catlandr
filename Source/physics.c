@@ -9,8 +9,7 @@
 unsigned int t; // Time tick to be updated ~25 times/sec
 unsigned int camera;
 unsigned int previouscamera;
-extern unsigned char running;
-extern unsigned char menu;
+extern unsigned char gamestate;
 
 void init_physics(void)
 {
@@ -186,12 +185,10 @@ void apply_input(void)
     }
 
     if (k0.keys.K_EXIT) {
-        running = false;
-        menu = false;
+        gamestate = EXIT;
     }
     if (k0.keys.K_F1) {
-        running = false;
-        menu = true;
+        gamestate = START_MENU;
     }
 
     prev_k0.raw = k0.raw;
