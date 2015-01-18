@@ -9,12 +9,18 @@
 #include "physics.h"
 #include "ti86.h"
 
-extern unsigned int frames;
-extern unsigned int dropped;
-extern unsigned char gamestate;
+unsigned int frames;
+unsigned int dropped;
+unsigned char gamestate;
 
 extern lock_t frame_lock;
 extern lock_t idle_lock;
+
+void init_game(void)
+{
+    frames = 0;
+    dropped = 0;
+}
 
 void force_call(void)
 {

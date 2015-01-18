@@ -11,9 +11,6 @@
 #include "ti86.h"
 
 unsigned int ticks;
-unsigned int frames;
-unsigned int dropped;
-unsigned char gamestate;
 
 void init(void);
 void reset(void);
@@ -47,16 +44,16 @@ int main(void)
     init();
     while (true) {
         switch (gamestate) {
-            case DONE_STRANDED:
-            case DONE_CRASHED:
-            case DONE_LANDED:
-            case GAME_RESET:
-            case START_MENU:
-                loop_menu(); break;
-            case GAME_RUNNING:
-                loop_game(); break;
-            case EXIT:
-                goto quit_program;
+        case DONE_STRANDED:
+        case DONE_CRASHED:
+        case DONE_LANDED:
+        case GAME_RESET:
+        case START_MENU:
+            loop_menu(); break;
+        case GAME_RUNNING:
+            loop_game(); break;
+        case EXIT:
+            goto quit_program;
         }
     }
 
@@ -69,9 +66,8 @@ quit_program:
 void reset(void)
 {
     ticks = 0;
-    frames = 0;
-    dropped = 0;
 
+    init_game();
     init_kibbles();
     init_kitty();
     init_lander();
