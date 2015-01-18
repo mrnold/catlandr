@@ -12,6 +12,7 @@
 %COMPILE% Source\kitty.c
 %COMPILE% Source\lander.c
 %COMPILE% Source\lock.c
+%COMPILE% Source\menu.c
 %COMPILE% Source\moon.c
 %COMPILE% Source\physics.c
 %COMPILE% Source\ti86.c
