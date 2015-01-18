@@ -7,8 +7,7 @@
 #include "physics.h"
 #include "ti86.h"
 
-extern unsigned char running;
-extern unsigned char menu;
+extern unsigned char gamestate;
 
 struct lander_t lander;
 
@@ -38,12 +37,15 @@ void stop_lander(unsigned char state)
     switch (state) {
         case STRANDED:
             lander.freedom.stuck.stranded = true;
+            gamestate = DONE_STRANDED;
             break;
         case CRASHED:
             lander.freedom.stuck.crashed = true;
+            gamestate = DONE_CRASHED;
             break;
         case LANDED:
             lander.freedom.stuck.landed = true;
+            gamestate = DONE_LANDED;
             break;
     }
     lander.thrust.hp_firing = false;
@@ -53,8 +55,6 @@ void stop_lander(unsigned char state)
     lander.acceleration.y = 0;
     lander.speed.x = 0;
     lander.speed.y = 0;
-    running = false;
-    menu = true;
 }
 
 void move_lander(void)
