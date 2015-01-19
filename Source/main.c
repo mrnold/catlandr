@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "camera.h"
 #include "game.h"
 #include "lander.h"
 #include "lock.h"
@@ -14,11 +15,7 @@ unsigned int ticks;
 
 void init(void);
 void reset(void);
-void showmenu(void);
-void gamesequence(void);
-void menusequence(void);
 void timer_callback(void);
-void menu_input(void);
 
 lock_t frame_lock;
 lock_t idle_lock;
@@ -68,6 +65,7 @@ void reset(void)
     ticks = 0;
 
     init_game();
+    init_camera();
     init_kibbles();
     init_kitty();
     init_lander();

@@ -8,6 +8,7 @@
 @set SDCCBASE=sdcc -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed -ISource
 
 %COMPILE% Source\bitmap.c
+%COMPILE% Source\camera.c
 %COMPILE% Source\game.c
 %COMPILE% Source\kibble.c
 %COMPILE% Source\kitty.c

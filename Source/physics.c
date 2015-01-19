@@ -8,13 +8,9 @@
 #include "ti86.h"
 
 unsigned int t; // Time tick to be updated ~25 times/sec
-unsigned int camera;
-unsigned int previouscamera;
 
 void init_physics(void)
 {
-    previouscamera = 0;
-    camera = 0;
     t = 0;
 }
 
@@ -72,7 +68,6 @@ void collisions(void)
                     stop_lander(CRASHED);
                     lander.x = i-LANDER_WIDTH;
                     lander.y = lander.previous.y;
-                    camera = previouscamera;
                     return;
                 } else {
                     lander.x = lander.previous.x;
@@ -97,7 +92,6 @@ void collisions(void)
                     stop_lander(CRASHED);
                     lander.x = i;
                     lander.y = lander.previous.y;
-                    camera = previouscamera;
                     return;
                 } else {
                     lander.x = edge;
