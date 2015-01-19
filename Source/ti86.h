@@ -54,7 +54,6 @@ void draw_moon(void) __naked;
 void printxy(unsigned char, unsigned char, const char * const);
 void draw_status(void);
 void draw_live_sprite(const unsigned char [8][4], unsigned char, unsigned short, unsigned char, char, char);
-void draw_static_sprite_noclip(const unsigned char image[8], unsigned short x, unsigned char y);
 void save_graphbuffer(void) __naked;
 void restore_graphbuffer(void) __naked;
 void flipscreen(void);
