@@ -37,7 +37,7 @@ void collisions(void)
     if (feet >= max) { // Lander touched down on something
         lander.y = max-LANDER_HEIGHT;
         if (lander.speed.y > IMPACT_MAX) {
-            lander.bitmap = img_downcrash;
+            lander.stage = LANDER_DOWNCRASH;
             stop_lander(CRASHED);
             return;
         }
@@ -64,7 +64,7 @@ void collisions(void)
             }
             if (moon[i] < feet) {
                 if (lander.speed.x > IMPACT_MAX) {
-                    lander.bitmap = img_rightcrash;
+                    lander.stage = LANDER_RIGHTCRASH;
                     stop_lander(CRASHED);
                     lander.x = i-LANDER_WIDTH;
                     lander.y = lander.previous.y;
@@ -88,7 +88,7 @@ void collisions(void)
             }
             if (moon[i] < feet) {
                 if (lander.speed.x < -IMPACT_MAX) {
-                    lander.bitmap = img_leftcrash;
+                    lander.stage = LANDER_LEFTCRASH;
                     stop_lander(CRASHED);
                     lander.x = i;
                     lander.y = lander.previous.y;

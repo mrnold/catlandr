@@ -36,7 +36,8 @@ struct lander_t {
         } stuck;
         unsigned char stopped;
     } freedom;
-    const unsigned char *bitmap;
+    const unsigned char (*bitmap)[][LANDER_STAGES];
+    unsigned char stage;
     unsigned char fuel;
     unsigned char food;
 };

@@ -1,3 +1,4 @@
+#include "bitmap.h"
 #include "camera.h"
 #include "lander.h"
 #include "moon.h"
@@ -530,26 +531,6 @@ void draw_status(void)
         *(screenbuffer+i) = 0xff;
     }
     *(screenbuffer+i) |= ((char)0x80 >> shift);
-}
-
-// Only for sprites guaranteed to be fully onscreen
-void draw_static_sprite_noclip(const unsigned char image[8], unsigned short x, unsigned char y)
-{
-    unsigned int yoffset = y<<4;
-    unsigned char i, rshift, lshift, screenx;
-    unsigned char *screenbyte;
-    unsigned int start;
-
-    screenx = x-camera;
-    rshift = screenx&0x07;
-    lshift = 8-rshift;
-    start = (screenx>>3)+yoffset;
-    screenbyte = screenbuffer+start;
-    for (i = 0; i < 8; i++) {
-        *screenbyte |= (image[i] >> rshift);
-        *(screenbyte+1) |= (image[i] << lshift);
-        screenbyte += 16;
-    }
 }
 
 // World x, not screen x.

@@ -19,7 +19,7 @@ void init_lander(void)
     lander.speed.y = 0;
     lander.acceleration.x = 0;
     lander.acceleration.y = GRAVITY;
-    lander.bitmap = img_lander;
+    lander.bitmap = &img_lander;
     lander.thrust.hp_stage = 0;
     lander.thrust.hp_firing = 0;
     lander.thrust.hn_stage = 0;
@@ -29,6 +29,7 @@ void init_lander(void)
     lander.freedom.stopped = false;
     lander.fuel = 255;
     lander.food = KIBBLE_MAX;
+    lander.stage = LANDER_FLYING;
 }
 
 void stop_lander(unsigned char state)
@@ -147,7 +148,7 @@ void move_lander(void)
 
 void draw_lander(void)
 {
-    draw_static_sprite_noclip(lander.bitmap, lander.x, lander.y);
+    draw_live_sprite(*(lander.bitmap), lander.stage, lander.x, lander.y, 0, OR);
 
     if (lander.thrust.hp_firing) { // Draw left thruster
         draw_live_sprite(img_thrustleft, lander.thrust.hp_stage, lander.x, lander.y, -8, OR);
