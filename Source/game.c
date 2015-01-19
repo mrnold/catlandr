@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "camera.h"
 #include "game.h"
 #include "kibble.h"
 #include "kitty.h"
@@ -34,6 +35,7 @@ void gamesequence(void)
     move_kitty();
     move_lander();
     collisions();
+    move_camera();
     draw_moon();
     draw_lander();
     draw_kitty();

@@ -64,7 +64,6 @@ void move_lander(void)
 
     lander.previous.x = lander.x;
     lander.previous.y = lander.y;
-    previouscamera = camera;
 
     if (lander.freedom.stuck.crashed) {
         kitty.bitmap = &cat_sittingleft;
@@ -117,27 +116,6 @@ void move_lander(void)
     } else {
         lander.x = (unsigned int)scratch;
     }
-
-    scratch = lander.x-camera;
-    if (scratch < LANDER_WIDTH) {
-        scratch = lander.x-LANDER_WIDTH;
-        if (scratch < 0) {
-            camera = 0;
-        } else {
-            camera = scratch;
-        }
-    }
-
-    scratch = camera+SCREEN_WIDTH-lander.x;
-    if (scratch < 2*LANDER_WIDTH) {
-        scratch = lander.x+2*LANDER_WIDTH-SCREEN_WIDTH;
-        if (scratch+SCREEN_WIDTH > MOON_WIDTH) {
-            camera = MOON_WIDTH-SCREEN_WIDTH;
-        } else {
-            camera = scratch;
-        }
-    }
-
 
     lander.speed.y += (lander.acceleration.y>>1);
     if (lander.speed.y > SPEED_MAX) {

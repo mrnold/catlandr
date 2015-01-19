@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "camera.h"
 #include "kibble.h"
 #include "misc.h"
 #include "moon.h"
