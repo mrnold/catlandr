@@ -1,14 +1,14 @@
 #include "bitmap.h"
+#include "physics.h"
 #include "camera.h"
 #include "game.h"
+#include "kibble.h"
 #include "lander.h"
 #include "lock.h"
-#include "kibble.h"
 #include "kitty.h"
 #include "menu.h"
 #include "misc.h"
 #include "moon.h"
-#include "physics.h"
 #include "ti86.h"
 
 unsigned int ticks;

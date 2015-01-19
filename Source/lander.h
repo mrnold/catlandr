@@ -8,7 +8,7 @@ enum lander_stops {
 };
 
 struct lander_t {
-    unsigned short x;
+/*    unsigned short x;
     unsigned char y;
     struct {
         unsigned short x;
@@ -19,7 +19,8 @@ struct lander_t {
     } speed;
     struct {
         char x, y;
-    } acceleration;
+    } acceleration;*/
+    struct physics_object phys;
     struct {
         unsigned char hp_stage   : 2; // Horizontal positive
         unsigned char hp_firing  : 1;

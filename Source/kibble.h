@@ -3,11 +3,7 @@
 #define KIBBLE_HEIGHT 8
 
 struct kibble_t {
-    unsigned short x;
-    unsigned char y;
-    struct {
-        char x, y;
-    } speed;
+    struct physics_object phys;
     const unsigned char (*bitmap)[][KIBBLE_FALLSTAGES];
     unsigned char stage;
     unsigned char ready;
