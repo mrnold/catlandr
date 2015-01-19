@@ -28,4 +28,4 @@ void draw_kitty(void);
 void init_kitty(void);
 void move_kitty(void);
 
-extern struct kitty_t kitty;
+__at (0xa800) extern struct kitty_t kitty;

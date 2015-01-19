@@ -7,7 +7,7 @@
 #include "ti86.h"
 #include "kitty.h"
 
-struct kitty_t kitty;
+__at (0xa800) struct kitty_t kitty;
 
 void init_kitty(void)
 {

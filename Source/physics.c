@@ -47,7 +47,7 @@ void collisions(void)
             }
             return;
         } else { // Uneven ground, 
-            lander.speed.y = -1*(lander.speed.y>>1);
+            lander.speed.y = 0;
             if (lander.speed.y == 0 && lander.fuel == 0) {
                 stop_lander(STRANDED);
             }

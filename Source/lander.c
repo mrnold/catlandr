@@ -9,7 +9,7 @@
 
 extern unsigned char gamestate;
 
-struct lander_t lander;
+__at (0xa700) struct lander_t lander;
 
 void init_lander(void)
 {
