@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "physics.h"
 #include "camera.h"
 #include "game.h"
 #include "kibble.h"
@@ -7,7 +8,6 @@
 #include "lock.h"
 #include "misc.h"
 #include "moon.h"
-#include "physics.h"
 #include "ti86.h"
 
 unsigned int frames;
@@ -34,7 +34,6 @@ void gamesequence(void)
     move_kibbles();
     move_kitty();
     move_lander();
-    collisions();
     move_camera();
     draw_moon();
     draw_lander();
@@ -75,8 +74,8 @@ void apply_input(void)
     scan_row_0(&k0);
 
     if (k6.keys.K_RIGHT) {
-        if (lander.acceleration.x < ACCEL_MAX && lander.x < MOON_WIDTH-LANDER_WIDTH-1) {
-            lander.acceleration.x++;
+        if (lander.phys.acceleration.x < ACCEL_MAX && lander.phys.position.x < MOON_WIDTH-LANDER_WIDTH-1) {
+            lander.phys.acceleration.x++;
         }
         lander.thrust.hp_firing = true;
         if ((t&0x03) == 0) { // Cycle ~6 times/sec
@@ -90,8 +89,8 @@ void apply_input(void)
         lander.thrust.hp_stage = 0;
     }
     if (k6.keys.K_LEFT) {
-        if (lander.acceleration.x > -ACCEL_MAX && lander.x > 0) {
-            lander.acceleration.x--;
+        if (lander.phys.acceleration.x > -ACCEL_MAX && lander.phys.position.x > 0) {
+            lander.phys.acceleration.x--;
         }
         lander.thrust.hn_firing = true;
         if ((t&0x03) == 0) {
@@ -107,11 +106,11 @@ void apply_input(void)
 
     // If both keys are pressed, cancel each acceleration
     // (without cancelling fuel consumption)
-    lander.acceleration.x *= (k6.keys.K_LEFT ^ k6.keys.K_RIGHT);
+    lander.phys.acceleration.x *= (k6.keys.K_LEFT ^ k6.keys.K_RIGHT);
 
     if (k6.keys.K_UP) {
-        if (lander.acceleration.y > -ACCEL_MAX && lander.y > 0) {
-            lander.acceleration.y--;
+        if (lander.phys.acceleration.y > -ACCEL_MAX && lander.phys.position.y > 0) {
+            lander.phys.acceleration.y--;
         }
         lander.thrust.vp_firing = true;
         if ((t&0x03) == 0) {
@@ -122,7 +121,7 @@ void apply_input(void)
         }
     } else {
         if (!lander.freedom.stuck.crashed) {
-            lander.acceleration.y = GRAVITY;
+            lander.phys.acceleration.y = GRAVITY;
         }
         lander.thrust.vp_firing = false;
         lander.thrust.vp_stage = 0;
@@ -130,7 +129,7 @@ void apply_input(void)
 
     if (k0.keys.K_2ND && !prev_k0.keys.K_2ND && lander.food > 0) {
         lander.food--;
-        create_kibble(lander.food, lander.x, lander.y, lander.speed.x, lander.speed.y);
+        create_kibble(lander.food, lander.phys.position.x, lander.phys.position.y, lander.phys.velocity.x, lander.phys.velocity.y);
     }
 
     if (k0.keys.K_EXIT) {

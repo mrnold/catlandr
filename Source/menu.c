@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "physics.h"
 #include "kibble.h"
 #include "kitty.h"
 #include "lander.h"

@@ -1,3 +1,4 @@
+#include "physics.h"
 #include "lander.h"
 #include "moon.h"
 #include "ti86.h"

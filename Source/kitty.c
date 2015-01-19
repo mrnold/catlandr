@@ -1,11 +1,11 @@
 #include "bitmap.h"
+#include "physics.h"
 #include "kibble.h"
+#include "kitty.h"
 #include "lander.h"
 #include "misc.h"
 #include "moon.h"
-#include "physics.h"
 #include "ti86.h"
-#include "kitty.h"
 
 struct kitty_t kitty;
 
@@ -44,23 +44,23 @@ void move_kitty(void)
 
     // Cat state machine
     if (kitty.state == SITTING) { // Initial state
-        if (lander.x == kitty.x || lander.freedom.stopped) {
+        if (lander.phys.position.x == kitty.x || lander.freedom.stopped) {
             nextstate = SITTING;
-        } else if (lander.x+LANDER_WIDTH < kitty.x) {
+        } else if (lander.phys.position.x+LANDER_WIDTH < kitty.x) {
             nextstate = RUNNING_LEFT;
-        } else if (lander.x > kitty.x+KITTY_WIDTH) {
+        } else if (lander.phys.position.x > kitty.x+KITTY_WIDTH) {
             nextstate = RUNNING_RIGHT;
         } else {
             nextstate = SITTING;
         }
     } else if (kitty.state == RUNNING_LEFT) {
-        scratch = lander.x+LANDER_WIDTH+3*KITTY_WIDTH;
+        scratch = lander.phys.position.x+LANDER_WIDTH+3*KITTY_WIDTH;
         kibble = find_kibbles(kitty.x);
-        if (lander.x == kitty.x || kitty.speed.x == 0) {
+        if (lander.phys.position.x == kitty.x || kitty.speed.x == 0) {
             nextstate = SITTING;
         } else if (kibble != (struct kibble_t *)NULL) {
             nextstate = SNACKING_LEFT;
-        } else if (lander.x > kitty.x) {
+        } else if (lander.phys.position.x > kitty.x) {
             nextstate = SITTING;
         } else if (kitty.x > scratch) {
             nextstate = RUNNING_LEFT;
@@ -72,13 +72,13 @@ void move_kitty(void)
             }
         }
     } else if (kitty.state == RUNNING_RIGHT) {
-        scratch = lander.x-3*KITTY_WIDTH;
+        scratch = lander.phys.position.x-3*KITTY_WIDTH;
         kibble = find_kibbles(kitty.x+KITTY_WIDTH);
-        if (lander.x == kitty.x || kitty.speed.x == 0) {
+        if (lander.phys.position.x == kitty.x || kitty.speed.x == 0) {
             nextstate = SITTING;
         } else if (kibble != (struct kibble_t *)NULL) {
             nextstate = SNACKING_RIGHT;
-        } else if (lander.x < kitty.x) {
+        } else if (lander.phys.position.x < kitty.x) {
             nextstate = SITTING;
         } else if (kitty.x < scratch) {
             nextstate = RUNNING_RIGHT;
@@ -152,12 +152,12 @@ void move_kitty(void)
     } else if (nextstate == JUMPING_LEFT) {
         kitty.bitmap = &cat_runleft;
         if (kitty.state != JUMPING_LEFT) { // Just starting a jump
-            kitty.speed.y = (lander.y-kitty.y)>>3;
+            kitty.speed.y = (lander.phys.position.y-kitty.y)>>3;
         }
     } else if (nextstate == JUMPING_RIGHT) {
         kitty.bitmap = &cat_runright;
         if (kitty.state != JUMPING_RIGHT) {
-            kitty.speed.y = (lander.y-kitty.y)>>3;
+            kitty.speed.y = (lander.phys.position.y-kitty.y)>>3;
         }
     } else if (nextstate == SNACKING_LEFT) {
         if (kitty.batting) {

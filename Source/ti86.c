@@ -1,7 +1,7 @@
+#include "physics.h"
 #include "camera.h"
 #include "lander.h"
 #include "moon.h"
-#include "physics.h"
 #include "ti86.h"
 
 static unsigned char r8;
