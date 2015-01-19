@@ -46,4 +46,4 @@ void init_lander(void);
 void move_lander(void);
 void stop_lander(unsigned char);
 
-extern struct lander_t lander;
+__at (0xa700) extern struct lander_t lander;
