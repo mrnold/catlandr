@@ -12,7 +12,7 @@ __at (0xa800) struct kitty_t kitty;
 void init_kitty(void)
 {
     kitty.y = 0;
-    kitty.x = 256;
+    kitty.x = random16()&0x3FF;
     kitty.speed.x = 0;
     kitty.speed.y = 0;
     kitty.stage = 0;
@@ -142,13 +142,21 @@ void move_kitty(void)
     } else if (nextstate == RUNNING_LEFT) {
         kitty.bitmap = &cat_runleft;
         kitty.y = max-KITTY_HEIGHT;
-        kitty.speed.x = -4;
         kitty.speed.y = 0;
+        if (kitty.x > camera+SCREEN_WIDTH) {
+            kitty.speed.x = -8;
+        } else {
+            kitty.speed.x = -4;
+        }
     } else if (nextstate == RUNNING_RIGHT) {
         kitty.bitmap = &cat_runright;
         kitty.y = max-KITTY_HEIGHT;
-        kitty.speed.x = 4;
         kitty.speed.y = 0;
+        if (camera > SCREEN_WIDTH && kitty.x < camera-SCREEN_WIDTH) {
+            kitty.speed.x = 8;
+        } else {
+            kitty.speed.x = 4;
+        }
     } else if (nextstate == JUMPING_LEFT) {
         kitty.bitmap = &cat_runleft;
         if (kitty.state != JUMPING_LEFT) { // Just starting a jump
