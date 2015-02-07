@@ -7,3 +7,6 @@
 #else
     #error No calculator model defined!
 #endif
+
+void setup_timer(void (*)(void));
+void timer_isr(void) __naked;

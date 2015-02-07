@@ -44,7 +44,7 @@ void gamesequence(void)
     draw_kitty();
     draw_kibbles();
     draw_status();
-    flipscreen();
+    updatescreen();
     force_call();
 }
 

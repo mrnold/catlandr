@@ -10,8 +10,4 @@
 #define SCREENBUF0_ADDRESS  0xfc00
 
 extern __at (PRERENDER_ADDRESS) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
-extern __at (MOON_ADDRESS) unsigned char moon[MOON_WIDTH];
-extern __at (KIBBLES_ADDRESS) struct kibble_t kibbles[KIBBLE_MAX];
-extern __at (LANDER_ADDRESS) struct lander_t lander;
-extern __at (KITTY_ADDRESS) struct kitty_t kitty;
 extern __at (BACKUPGRAPH_ADDRESS) unsigned char *backupgraph;

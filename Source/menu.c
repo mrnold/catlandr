@@ -47,7 +47,7 @@ void menusequence(void)
     draw_lander();
     draw_kitty();
     draw_kibbles();
-    flipscreen();
+    updatescreen();
 }
 
 void menu_input(void)
