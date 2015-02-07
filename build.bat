@@ -77,10 +77,10 @@
 @set BUILD=@call :build
 @set COMPILE=@call :compile
 @set FAKE=@call :fake
-@set SDCCBASE=%SDCC% -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed -ISource
+@set SDCCBASE=%SDCC% -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed -ISource -ISource\ti86
 
 @mkdir Build > NUL 2>&1
-%SDAS% -p -g -o Build\ti86_crt0.rel Source\ti86_crt0.s
+%SDAS% -p -g -o Build\ti86_crt0.rel Source\ti86\ti86_crt0.s
 
 %COMPILE% Source\bitmap.c
 %COMPILE% Source\camera.c
@@ -92,7 +92,7 @@
 %COMPILE% Source\menu.c
 %COMPILE% Source\moon.c
 %COMPILE% Source\physics.c
-%COMPILE% Source\ti86.c
+%COMPILE% Source\ti86\ti86.c
 %BUILD% Source\main.c
 
 @rem SDCC generates main.ihx instead of main.c.ihx?
