@@ -9,7 +9,10 @@
 #include "moon.h"
 #include "physics.h"
 #include "display.h"
+#include "input.h"
+#include "ram.h"
 #include "ti86.h"
+#include "timer.h"
 
 unsigned int frames;
 unsigned int dropped;

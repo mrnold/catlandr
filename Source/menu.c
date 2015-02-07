@@ -7,7 +7,9 @@
 #include "misc.h"
 #include "moon.h"
 #include "display.h"
+#include "input.h"
 #include "ti86.h"
+#include "timer.h"
 
 extern unsigned char gamestate;
 extern lock_t idle_lock;

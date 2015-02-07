@@ -11,6 +11,7 @@
 #include "physics.h"
 #include "display.h"
 #include "ti86.h"
+#include "timer.h"
 
 unsigned int ticks;
 

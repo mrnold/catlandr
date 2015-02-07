@@ -5,7 +5,9 @@
 #include "moon.h"
 #include "physics.h"
 #include "display.h"
+#include "ram.h"
 #include "ti86.h"
+#include "timer.h"
 
 void init_kibbles(void)
 {
