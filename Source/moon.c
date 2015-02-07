@@ -1,10 +1,11 @@
 #include "bitmap.h"
+#include "kibble.h"
 #include "lander.h"
 #include "moon.h"
+#include "ti86display.h"
 #include "ti86.h"
 
 unsigned short landingpad;
-__at (MOON_SAFERAM) unsigned char moon[MOON_WIDTH];
 
 void init_moon(void)
 {

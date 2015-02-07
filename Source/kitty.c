@@ -4,10 +4,9 @@
 #include "misc.h"
 #include "moon.h"
 #include "physics.h"
+#include "ti86display.h"
 #include "ti86.h"
 #include "kitty.h"
-
-__at (0xa800) struct kitty_t kitty;
 
 void init_kitty(void)
 {

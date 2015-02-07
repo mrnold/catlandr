@@ -4,9 +4,8 @@
 #include "misc.h"
 #include "moon.h"
 #include "physics.h"
+#include "ti86display.h"
 #include "ti86.h"
-
-__at (0xa600) struct kibble_t kibbles[KIBBLE_MAX];
 
 void init_kibbles(void)
 {

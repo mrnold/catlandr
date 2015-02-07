@@ -6,6 +6,7 @@
 #include "menu.h"
 #include "misc.h"
 #include "moon.h"
+#include "ti86display.h"
 #include "ti86.h"
 
 extern unsigned char gamestate;
