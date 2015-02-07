@@ -88,6 +88,4 @@ void generate_moon(void)
         stride = i;
         i /= 2;
     }
-
-    prerender();
 }
