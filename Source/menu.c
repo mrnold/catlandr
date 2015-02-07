@@ -8,7 +8,7 @@
 #include "moon.h"
 #include "calc/display.h"
 #include "calc/input.h"
-#include "calc/ti86/ti86.h"
+#include "calc/random.h"
 #include "calc/timer.h"
 
 extern unsigned char gamestate;
