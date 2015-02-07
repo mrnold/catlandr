@@ -74,7 +74,8 @@ void reset(void)
 
     init_lock(idle_lock);
     init_lock(frame_lock);
-    setup_timer(&timer_callback);
+    setup_timer(timer_callback);
+    setup_refresh(menusequence);
 }
 
 void timer_callback(void)

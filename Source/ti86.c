@@ -5,40 +5,41 @@
 #include "physics.h"
 #include "ti86.h"
 
+void (*refresh)(void);
 static void (*callback_function)(void);
+unsigned char *screenbuffer = 0xca00; // Backup screen
+__sfr __at 0x00 lcdptr; // Port that tells the LCD where to look
 
 __at (0x8100) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
-__at (0xca00) unsigned char screenbuffer1[SCREEN_HEIGHT][SCREEN_WIDTH/8];
-__at (0xfc00) unsigned char screenbuffer2[SCREEN_HEIGHT][SCREEN_WIDTH/8];
 __at (0xb000) unsigned char *backupgraph;
 
 __at (0xc37c) unsigned char textcol;
 __at (0xc37d) unsigned char textrow;
 
-unsigned char *screenbuffer = 0xca00;
-
-__sfr __at 0x00 lcdptr;
+static void refresh_sequence(void) __naked
+{
+    __asm
+        ld hl, #refresh_sequence_done
+        push hl
+        ld hl, (#_refresh)
+        jp (hl)
+    refresh_sequence_done:
+        ret
+    __endasm;
+}
 
 void printxy(unsigned char col, unsigned char row, const char * const string)
 {
     string;
     textcol = col;
     textrow = row;
+    if (screenbuffer == (unsigned char *)0xfc00) {
+        refresh_sequence();
+    }
     __asm
-        push hl
         ld l, 6(ix)
         ld h, 7(ix)
         call #0x4aa5
-        pop hl
-    __endasm;
-}
-
-void idle(void) __naked
-{
-    __asm
-        ei
-        halt
-        ret
     __endasm;
 }
 
@@ -204,23 +205,6 @@ void scan_row_0(union keyrow_0 *k0)
 {
     keyport = 0xbf;
     k0->raw = ~keyport;
-}
-
-void screencopy(void) __naked
-{
-    __asm
-        push bc
-        push de
-        push hl
-        ld hl, (#_screenbuffer)
-        ld de, #0xfc00
-        ld bc, #1024
-        ldir
-        pop hl
-        pop de
-        pop bc
-        ret
-    __endasm;
 }
 
 void prerender(void)
