@@ -5,11 +5,10 @@
 #include "misc.h"
 #include "moon.h"
 #include "physics.h"
+#include "ti86display.h"
 #include "ti86.h"
 
 extern unsigned char gamestate;
-
-__at (0xa700) struct lander_t lander;
 
 void init_lander(void)
 {

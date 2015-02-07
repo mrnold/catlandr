@@ -9,6 +9,7 @@
 #include "misc.h"
 #include "moon.h"
 #include "physics.h"
+#include "ti86display.h"
 #include "ti86.h"
 
 unsigned int ticks;
@@ -71,6 +72,7 @@ void reset(void)
     init_lander();
     init_moon();
     init_physics();
+    init_calculator();
 
     init_lock(idle_lock);
     init_lock(frame_lock);

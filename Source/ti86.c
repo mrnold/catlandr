@@ -1,20 +1,29 @@
 #include "bitmap.h"
 #include "camera.h"
+#include "kibble.h"
 #include "lander.h"
 #include "moon.h"
 #include "physics.h"
+#include "ti86display.h"
 #include "ti86.h"
 
 void (*refresh)(void);
 static void (*callback_function)(void);
-unsigned char *screenbuffer = 0xca00; // Backup screen
+unsigned char *screenbuffer = SCREENBUF1_ADDRESS; // Off-screen buffer
 __sfr __at 0x00 lcdptr; // Port that tells the LCD where to look
 
-__at (0x8100) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
-__at (0xb000) unsigned char *backupgraph;
+__at (PRERENDER_ADDRESS) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
+__at (MOON_ADDRESS) unsigned char moon[MOON_WIDTH];
+__at (KIBBLES_ADDRESS) struct kibble_t kibbles[KIBBLE_MAX];
+__at (LANDER_ADDRESS) struct lander_t lander;
+__at (KITTY_ADDRESS) struct kitty_t kitty;
+__at (BACKUPGRAPH_ADDRESS) unsigned char *backupgraph;
+__at (TEXTCOL_ADDRESS) unsigned char textcol;
+__at (TEXTROW_ADDRESS) unsigned char textrow;
 
-__at (0xc37c) unsigned char textcol;
-__at (0xc37d) unsigned char textrow;
+void init_calculator(void)
+{
+}
 
 static void refresh_sequence(void) __naked
 {
@@ -57,18 +66,10 @@ void flipscreen(void)
 void save_graphbuffer(void) __naked
 {
     __asm
-        push af
-        push bc
-        push de
-        push hl
         ld bc, #0x0400
         ld de, #0xb000
         ld hl, #0xca00
         ldir
-        pop hl
-        pop de
-        pop bc
-        pop af
         ret
     __endasm;
 }
@@ -77,18 +78,10 @@ void restore_graphbuffer(void) __naked
 {
     lcdptr = 0x3c;
     __asm
-        push af
-        push bc
-        push de
-        push hl
         ld bc, #0x0400
         ld de, #0xca00
         ld hl, #0xb000
         ldir
-        pop hl
-        pop de
-        pop bc
-        pop af
         ret
     __endasm;
 }
@@ -96,20 +89,12 @@ void restore_graphbuffer(void) __naked
 void clear_screen(void) __naked
 {
     __asm
-        push af
-        push bc
-        push de
-        push hl
         ld hl, #0xfc00
         xor a
         ld (hl), a
         ld bc, #0x03ff
         ld de, #0xfc01
         ldir
-        pop hl
-        pop de
-        pop bc
-        pop af
         ret
     __endasm;
 }
@@ -174,10 +159,8 @@ void set_timer(void) __naked
 unsigned char random8(void) __naked
 {
     __asm
-        push af
         ld a, r
         ld l, a
-        pop af
         ret
     __endasm;
 }
@@ -185,12 +168,10 @@ unsigned char random8(void) __naked
 unsigned short random16(void) __naked
 {
     __asm
-        push af
         ld a, r
         ld l, a
         ld a, r
         ld h, a
-        pop af
         ret
     __endasm;
 }
@@ -214,19 +195,11 @@ void prerender(void)
     unsigned char height;
 
     __asm
-        push hl
-        push de
-        push bc
-
         ld hl, #_prerendered
         ld (hl), #0
         ld de, #_prerendered+1
         ld bc, #8191
         ldir
-
-        pop bc
-        pop de
-        pop hl
     __endasm;
 
     for (j = 0; j < (MOON_WIDTH-1); j++) {
