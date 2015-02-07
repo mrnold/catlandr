@@ -47,6 +47,7 @@ void gamesequence(void)
 
 void loop_game(void)
 {
+    setup_refresh(gamesequence);
     while (gamestate == GAME_RUNNING) {
         wait_lock(idle_lock);
         wait_lock(frame_lock);

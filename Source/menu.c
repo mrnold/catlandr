@@ -14,6 +14,7 @@ extern void init(void);
 
 void loop_menu(void)
 {
+    setup_refresh(menusequence);
     menusequence();
     showmenu();
 
@@ -72,9 +73,6 @@ void menu_input(void)
 
 void showmenu(void)
 {
-    if (screenbuffer == (unsigned char *)0xfc00) {
-        menusequence();
-    }
     printxy(0, 0,  "EXIT to quit");
     printxy(0, 6,  "F1 for this menu");
     printxy(0, 12, "F2 for a new moon");

@@ -1,11 +1,13 @@
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 
+#define setup_refresh(callback) refresh = callback
+#define idle() __asm__("ei\nhalt")
+
 extern __at (0x8100) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
-extern __at (0xca00) unsigned char screenbuffer1[SCREEN_HEIGHT][SCREEN_WIDTH/8];
-extern __at (0xfc00) unsigned char screenbuffer2[SCREEN_HEIGHT][SCREEN_WIDTH/8];
 extern __at (0xb000) unsigned char *backupgraph;
 extern unsigned char *screenbuffer;
+extern void (*refresh)(void);
 
 union keyrow_0 {
     struct {
@@ -37,8 +39,6 @@ enum sprite_mode {
     OR
 };
 
-void putchar(char c) __naked;
-void idle(void) __naked;
 void clear_screen(void) __naked;
 void clear_buffer(void) __naked;
 void timer_isr(void) __naked;
@@ -48,7 +48,6 @@ unsigned char random8(void);
 unsigned short random16(void);
 void scan_row_6(union keyrow_6 *);
 void scan_row_0(union keyrow_0 *);
-void screencopy(void) __naked;
 void prerender(void);
 void draw_moon(void) __naked;
 void printxy(unsigned char, unsigned char, const char * const);
