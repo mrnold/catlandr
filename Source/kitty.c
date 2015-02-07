@@ -4,7 +4,7 @@
 #include "misc.h"
 #include "moon.h"
 #include "physics.h"
-#include "ti86display.h"
+#include "display.h"
 #include "ti86.h"
 #include "kitty.h"
 

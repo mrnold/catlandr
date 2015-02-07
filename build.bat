@@ -70,17 +70,21 @@
 @exit /b
 :sdccok
 
+@if {%CALC%} == {} (
+    @set CALC=ti86
+)
+
 @set SDCC=%SDCCDIR%\sdcc.exe
 @set SDAS=%SDCCDIR%\sdasz80.exe
 @set PYTHON=%PYTHONDIR%\python.exe
-@set LINKS=Build\ti86_crt0.rel
+@set LINKS=Build\%CALC%_crt0.rel
 @set BUILD=@call :build
 @set COMPILE=@call :compile
 @set FAKE=@call :fake
-@set SDCCBASE=%SDCC% -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed -ISource -ISource\ti86
+@set SDCCBASE=%SDCC% -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed -ISource -ISource\%CALC%
 
 @mkdir Build > NUL 2>&1
-%SDAS% -p -g -o Build\ti86_crt0.rel Source\ti86\ti86_crt0.s
+%SDAS% -p -g -o Build\%CALC%_crt0.rel Source\%CALC%\crt0.s
 
 %COMPILE% Source\bitmap.c
 %COMPILE% Source\camera.c
@@ -92,7 +96,7 @@
 %COMPILE% Source\menu.c
 %COMPILE% Source\moon.c
 %COMPILE% Source\physics.c
-%COMPILE% Source\ti86\ti86.c
+%COMPILE% Source\%CALC%\%CALC%.c
 %BUILD% Source\main.c
 
 @rem SDCC generates main.ihx instead of main.c.ihx?
