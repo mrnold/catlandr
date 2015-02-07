@@ -5,8 +5,6 @@
 #include "physics.h"
 #include "ti86.h"
 
-static unsigned char r8;
-static unsigned short r16;
 static void (*callback_function)(void);
 
 __at (0x8100) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
@@ -172,30 +170,28 @@ void set_timer(void) __naked
     __endasm;
 }
 
-unsigned char random8(void)
+unsigned char random8(void) __naked
 {
     __asm
         push af
         ld a, r
-        ld (#_r8), a
+        ld l, a
         pop af
+        ret
     __endasm;
-
-    return r8;
 }
 
-unsigned short random16(void)
+unsigned short random16(void) __naked
 {
     __asm
         push af
         ld a, r
-        ld (#_r16), a
+        ld l, a
         ld a, r
-        ld (#_r16+1), a
+        ld h, a
         pop af
+        ret
     __endasm;
-
-    return r16;
 }
 
 __sfr __at 0x01 keyport;
