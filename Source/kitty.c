@@ -6,7 +6,7 @@
 #include "physics.h"
 #include "calc/display.h"
 #include "calc/ram.h"
-#include "calc/ti86/ti86.h"
+#include "calc/random.h"
 #include "kitty.h"
 
 void init_kitty(void)

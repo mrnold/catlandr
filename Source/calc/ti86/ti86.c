@@ -5,8 +5,11 @@
 #include "lander.h"
 #include "moon.h"
 #include "physics.h"
+
 #include "display.h"
+#include "init.h"
 #include "ram.h"
+#include "random.h"
 #include "timer.h"
 
 void (*refresh)(void);

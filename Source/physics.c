@@ -7,7 +7,7 @@
 #include "physics.h"
 #include "calc/display.h"
 #include "calc/ram.h"
-#include "calc/ti86/ti86.h"
+#include "calc/random.h"
 
 unsigned int t; // Time tick to be updated ~25 times/sec
 
