@@ -2,9 +2,9 @@
 #include "kibble.h"
 #include "lander.h"
 #include "moon.h"
-#include "display.h"
-#include "ram.h"
-#include "ti86.h"
+#include "calc/display.h"
+#include "calc/ram.h"
+#include "calc/ti86/ti86.h"
 
 unsigned short landingpad;
 

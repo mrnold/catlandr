@@ -3,7 +3,7 @@
 #include "kibble.h"
 #include "lander.h"
 #include "moon.h"
-#include "display.h"
+#include "calc/display.h"
 
 unsigned int camera;
 unsigned int previouscamera;

@@ -9,9 +9,9 @@
 #include "misc.h"
 #include "moon.h"
 #include "physics.h"
-#include "display.h"
-#include "ti86.h"
-#include "timer.h"
+#include "calc/display.h"
+#include "calc/timer.h"
+#include "calc/ti86/ti86.h"
 
 unsigned int ticks;
 
