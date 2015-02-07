@@ -5,6 +5,7 @@
 #include "moon.h"
 #include "physics.h"
 #include "display.h"
+#include "ram.h"
 #include "ti86.h"
 #include "kitty.h"
 

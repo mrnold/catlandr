@@ -6,6 +6,7 @@
 #include "moon.h"
 #include "physics.h"
 #include "display.h"
+#include "ram.h"
 #include "ti86.h"
 
 unsigned int t; // Time tick to be updated ~25 times/sec

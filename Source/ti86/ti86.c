@@ -1,11 +1,13 @@
 #include "bitmap.h"
 #include "camera.h"
 #include "kibble.h"
+#include "input.h"
 #include "lander.h"
 #include "moon.h"
 #include "physics.h"
-#include "ti86display.h"
-#include "ti86.h"
+#include "display.h"
+#include "ram.h"
+#include "timer.h"
 
 void (*refresh)(void);
 static void (*callback_function)(void);
