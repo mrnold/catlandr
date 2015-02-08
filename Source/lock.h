@@ -1,14 +1,14 @@
 #define hash #
 #define f(x) x
 #define label(x) f(hash)_##x
-#define offset(x) f(hash)x
+#define offset(x) f(hash).x
 
 #define wait_lock(x) \
     __asm \
         push hl \
         ld hl, label(x) \
         sra (hl) \
-        jr c, offset(-2) \
+        jp c, offset(-2) \
         pop hl \
     __endasm;
 

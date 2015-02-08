@@ -33,6 +33,23 @@ __at (KITTY_ADDRESS) struct kitty_t kitty;
 __at (BACKUPGRAPH_ADDRESS) unsigned char *backupgraph;
 __at (TEXTCOL_ADDRESS) unsigned char textcol;
 __at (TEXTROW_ADDRESS) unsigned char textrow;
+
+void memset(void *ptr, unsigned char value, unsigned short count)
+{
+    ptr, value, count;
+    __asm
+        ld l, 4(ix)
+        ld h, 5(ix)
+        ld e, 4(ix)
+        ld d, 5(ix)
+        ld c, 7(ix)
+        ld b, 8(ix)
+        ld a, 6(ix)
+        ld (hl), a
+        inc de
+        ldir
+    __endasm;
+}
 // End of RAM interface ----------------------------------------------
 
 

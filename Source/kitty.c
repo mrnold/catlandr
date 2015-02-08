@@ -1,13 +1,14 @@
 #include "bitmap.h"
+#include "camera.h"
 #include "kibble.h"
+#include "kitty.h"
 #include "lander.h"
 #include "misc.h"
 #include "moon.h"
 #include "physics.h"
 #include "calc/display.h"
-#include "calc/ram.h"
 #include "calc/random.h"
-#include "kitty.h"
+#include "calc/ram.h"
 
 void init_kitty(void)
 {
