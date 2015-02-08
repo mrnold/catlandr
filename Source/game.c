@@ -15,6 +15,8 @@
 
 unsigned int frames;
 unsigned int dropped;
+unsigned int crashes;
+unsigned int landings;
 unsigned char gamestate;
 
 extern lock_t frame_lock;
@@ -62,6 +64,14 @@ void loop_game(void)
         while (is_locked(idle_lock)) {
             idle();
         }
+    }
+    switch (gamestate) {
+    case DONE_STRANDED:
+    case DONE_CRASHED:
+        crashes++; break;
+    case DONE_LANDED:
+        landings++; break;
+    default:
     }
 }
 
