@@ -23,21 +23,7 @@ void generate_moon(void)
     unsigned char rand;
     unsigned char landingheight;
 
-    __asm
-        push hl
-        push de
-        push bc
-
-        ld hl, #_moon
-        ld (hl), #0
-        ld de, #_moon+1
-        ld bc, #1024
-        ldir
-
-        pop bc
-        pop de
-        pop hl
-    __endasm;
+    memset(moon, 0, 1024);
 
     moon[0] = SCREEN_HEIGHT-SCREEN_HEIGHT/8;
     moon[MOON_WIDTH-1] = SCREEN_HEIGHT-SCREEN_HEIGHT/8;

@@ -12,3 +12,5 @@ extern __at (MOON_ADDRESS) unsigned char moon[MOON_WIDTH];
 extern __at (KIBBLES_ADDRESS) struct kibble_t kibbles[KIBBLE_MAX];
 extern __at (LANDER_ADDRESS) struct lander_t lander;
 extern __at (KITTY_ADDRESS) struct kitty_t kitty;
+
+void memset(void *, unsigned char, unsigned short);
