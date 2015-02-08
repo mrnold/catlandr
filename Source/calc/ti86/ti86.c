@@ -122,11 +122,11 @@ unsigned char *screenbuffer = SCREENBUF1_ADDRESS; // Off-screen buffer
 void clear_screen(void) __naked
 {
     __asm
-        ld hl, #0xfc00
+        ld hl, #SCREENBUF0_ADDRESS
         xor a
         ld (hl), a
         ld bc, #0x03ff
-        ld de, #0xfc01
+        ld de, #SCREENBUF0_ADDRESS+1
         ldir
         ret
     __endasm;
@@ -398,13 +398,13 @@ void printxy(unsigned char col, unsigned char row, const char * const string)
 void print(const char * const string)
 {
     string;
-    if (screenbuffer == (unsigned char *)0xfc00) {
+    if (screenbuffer == (unsigned char *)SCREENBUF0_ADDRESS) {
         refresh_sequence();
     }
     __asm
         ld l, 4(ix)
         ld h, 5(ix)
-        call #0x4aa5
+        call #VPUTS
     __endasm;
 }
 
@@ -422,7 +422,7 @@ void printnum(unsigned int number)
     if (number == 0) {
         print("0");
     } else {
-        if (screenbuffer == (unsigned char *)0xfc00) {
+        if (screenbuffer == (unsigned char *)SCREENBUF0_ADDRESS) {
             refresh_sequence();
         }
         printdigits(number);
@@ -431,12 +431,13 @@ void printnum(unsigned int number)
 
 static void printdigits(unsigned int number)
 {
+    number;
     __asm
         ld l, 4(ix)
         ld h, 5(ix)
         ld b, #5
     printnumxygetdigits:
-        call #0x4044 ;// _divHLby10, remainder in A
+        call #DIVHLBY10 ;// _divHLby10, remainder in A
         push af
         djnz printnumxygetdigits
         ld b, #5
@@ -449,18 +450,18 @@ static void printdigits(unsigned int number)
         pop af
     printnumxyprintdigitsskip:
         add #0x30    ;// Add ASCII numbers offset
-        call #0x4aa1 ;// _vputmap
+        call #VPUTMAP
         djnz printnumxyprintdigits
     __endasm;
 }
 
 void updatescreen(void)
 {
-    if (screenbuffer == (unsigned char *)0xfc00) {
-        screenbuffer = (unsigned char *)0xca00;
+    if (screenbuffer == (unsigned char *)SCREENBUF0_ADDRESS) {
+        screenbuffer = (unsigned char *)SCREENBUF1_ADDRESS;
         lcdptr = 0x3c;
     } else {
-        screenbuffer = (unsigned char *)0xfc00;
+        screenbuffer = (unsigned char *)SCREENBUF0_ADDRESS;
         lcdptr = 0x0a;
     }
 }
@@ -492,8 +493,8 @@ void save_graphbuffer(void) __naked
 {
     __asm
         ld bc, #0x0400
-        ld de, #0xb000
-        ld hl, #0xca00
+        ld de, #BACKUPGRAPH_ADDRESS
+        ld hl, #SCREENBUF1_ADDRESS
         ldir
         ret
     __endasm;
@@ -504,8 +505,8 @@ void restore_graphbuffer(void) __naked
     lcdptr = 0x3c;
     __asm
         ld bc, #0x0400
-        ld de, #0xca00
-        ld hl, #0xb000
+        ld de, #SCREENBUF1_ADDRESS
+        ld hl, #BACKUPGRAPH_ADDRESS
         ldir
         ret
     __endasm;
