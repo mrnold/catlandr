@@ -39,6 +39,8 @@ void init(void)
 
 int main(void)
 {
+    crashes = 0;
+    landings = 0;
     save_graphbuffer();
     clear_screen();
     init();

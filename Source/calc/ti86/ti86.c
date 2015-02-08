@@ -392,13 +392,65 @@ void printxy(unsigned char col, unsigned char row, const char * const string)
     string;
     textcol = col;
     textrow = row;
+    print(string);
+}
+
+void print(const char * const string)
+{
+    string;
     if (screenbuffer == (unsigned char *)0xfc00) {
         refresh_sequence();
     }
     __asm
-        ld l, 6(ix)
-        ld h, 7(ix)
+        ld l, 4(ix)
+        ld h, 5(ix)
         call #0x4aa5
+    __endasm;
+}
+
+void printnumxy(unsigned char col, unsigned char row, unsigned int number)
+{
+    number;
+    textcol = col;
+    textrow = row;
+    printnum(number);
+}
+
+static void printdigits(unsigned int number);
+void printnum(unsigned int number)
+{
+    if (number == 0) {
+        print("0");
+    } else {
+        if (screenbuffer == (unsigned char *)0xfc00) {
+            refresh_sequence();
+        }
+        printdigits(number);
+    }
+}
+
+static void printdigits(unsigned int number)
+{
+    __asm
+        ld l, 4(ix)
+        ld h, 5(ix)
+        ld b, #5
+    printnumxygetdigits:
+        call #0x4044 ;// _divHLby10, remainder in A
+        push af
+        djnz printnumxygetdigits
+        ld b, #5
+    printnumxystripzero:
+        pop af
+        cp #0
+        jp nz, printnumxyprintdigitsskip
+        djnz printnumxystripzero
+    printnumxyprintdigits:
+        pop af
+    printnumxyprintdigitsskip:
+        add #0x30    ;// Add ASCII numbers offset
+        call #0x4aa1 ;// _vputmap
+        djnz printnumxyprintdigits
     __endasm;
 }
 

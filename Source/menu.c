@@ -1,4 +1,5 @@
 #include "bitmap.h"
+#include "game.h"
 #include "kibble.h"
 #include "kitty.h"
 #include "lander.h"
@@ -82,13 +83,20 @@ void showmenu(void)
     printxy(0, 18, "2ND to drop a kibble");
     printxy(0, 24, "Arrow keys for thrusters");
 
+    if (lander.freedom.stopped) {
+        printxy(62, 6, "Successes/Failures");
+        printnumxy(80, 12, landings);
+        print("/");
+        printnum(crashes);
+    }
+
     if (lander.freedom.stuck.crashed) {
-        printxy(87, 6, "Lander");
-        printxy(91, 12, "destroyed!");
+        printxy(87, 18, "Lander");
+        printxy(91, 24, "destroyed!");
     } else if (lander.freedom.stuck.stranded) {
-        printxy(80, 6, "Out of fuel!");
+        printxy(84, 18, "Out of fuel!");
     } else if (lander.freedom.stuck.landed) {
-        printxy(80, 6, "Safe landing!");
+        printxy(84, 18, "Safe landing!");
     } else {
         printxy(89, 0,  "Land safely");
         printxy(85, 6,  "to feed Luna!");
