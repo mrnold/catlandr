@@ -9,5 +9,9 @@
 #define SCREENBUF1_ADDRESS  0xca00
 #define SCREENBUF0_ADDRESS  0xfc00
 
+#define DIVHLBY10           0x4044
+#define VPUTMAP             0x4aa1
+#define VPUTS               0x4aa5
+
 extern __at (PRERENDER_ADDRESS) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
 extern __at (BACKUPGRAPH_ADDRESS) unsigned char *backupgraph;
