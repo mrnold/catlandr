@@ -8,7 +8,10 @@
 #include "misc.h"
 #include "moon.h"
 #include "physics.h"
-#include "ti86.h"
+#include "calc/display.h"
+#include "calc/input.h"
+#include "calc/ram.h"
+#include "calc/timer.h"
 
 unsigned int frames;
 unsigned int dropped;
@@ -41,7 +44,7 @@ void gamesequence(void)
     draw_kitty();
     draw_kibbles();
     draw_status();
-    flipscreen();
+    updatescreen();
     force_call();
 }
 
