@@ -1,10 +1,12 @@
 #include "bitmap.h"
+#include "kibble.h"
 #include "lander.h"
 #include "moon.h"
-#include "ti86.h"
+#include "calc/display.h"
+#include "calc/ram.h"
+#include "calc/random.h"
 
 unsigned short landingpad;
-__at (MOON_SAFERAM) unsigned char moon[MOON_WIDTH];
 
 void init_moon(void)
 {
@@ -21,21 +23,7 @@ void generate_moon(void)
     unsigned char rand;
     unsigned char landingheight;
 
-    __asm
-        push hl
-        push de
-        push bc
-
-        ld hl, #_moon
-        ld (hl), #0
-        ld de, #_moon+1
-        ld bc, #1024
-        ldir
-
-        pop bc
-        pop de
-        pop hl
-    __endasm;
+    memset(moon, 0, 1024);
 
     moon[0] = SCREEN_HEIGHT-SCREEN_HEIGHT/8;
     moon[MOON_WIDTH-1] = SCREEN_HEIGHT-SCREEN_HEIGHT/8;
@@ -86,6 +74,4 @@ void generate_moon(void)
         stride = i;
         i /= 2;
     }
-
-    prerender();
 }

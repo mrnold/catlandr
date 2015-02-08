@@ -70,30 +70,33 @@
 @exit /b
 :sdccok
 
+@if {%CALC%} == {} (
+    @set CALC=ti86
+)
+
 @set SDCC=%SDCCDIR%\sdcc.exe
 @set SDAS=%SDCCDIR%\sdasz80.exe
 @set PYTHON=%PYTHONDIR%\python.exe
-@set LINKS=Build\ti86_crt0.rel
+@set LINKS=Build\%CALC%_crt0.rel
 @set BUILD=@call :build
 @set COMPILE=@call :compile
 @set FAKE=@call :fake
-@set SDCCBASE=%SDCC% -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed -ISource
+@set SDCCBASE=%SDCC% -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed -ISource -DCALCULATOR_MODEL=86
 
 @mkdir Build > NUL 2>&1
-%SDAS% -p -g -o Build\ti86_crt0.rel Source\ti86_crt0.s
+%SDAS% -p -g -o Build\%CALC%_crt0.rel Source\calc\%CALC%\crt0.s
 
-%COMPILE% Source\bitmap.c
-%COMPILE% Source\camera.c
-%COMPILE% Source\game.c
-%COMPILE% Source\kibble.c
-%COMPILE% Source\kitty.c
-%COMPILE% Source\lander.c
-%COMPILE% Source\lock.c
-%COMPILE% Source\menu.c
-%COMPILE% Source\moon.c
-%COMPILE% Source\physics.c
-%COMPILE% Source\ti86.c
-%BUILD% Source\main.c
+%COMPILE% Source\bitmap.c || goto :failed
+%COMPILE% Source\camera.c || goto :failed
+%COMPILE% Source\game.c || goto :failed
+%COMPILE% Source\kibble.c || goto :failed
+%COMPILE% Source\kitty.c || goto :failed
+%COMPILE% Source\lander.c || goto :failed
+%COMPILE% Source\menu.c || goto :failed
+%COMPILE% Source\moon.c || goto :failed
+%COMPILE% Source\physics.c || goto :failed
+%COMPILE% Source\calc\%CALC%\%CALC%.c || goto :failed
+%BUILD% Source\main.c || goto :failed
 
 @rem SDCC generates main.ihx instead of main.c.ihx?
 %PYTHON% Tools\ihxtobin.py Build\Source\main.ihx
@@ -123,5 +126,8 @@
 @rmdir Build\%1 > NUL 2>&1
 %SDCCBASE% --out-fmt-ihx -o Build\%1.ihx --data-loc 0 --code-loc 0xD74E %LINKS% %1
 @goto :done
+
+:failed
+@echo Build failed!
 
 :done

@@ -1,13 +1,14 @@
 #include "bitmap.h"
+#include "camera.h"
 #include "kibble.h"
+#include "kitty.h"
 #include "lander.h"
 #include "misc.h"
 #include "moon.h"
 #include "physics.h"
-#include "ti86.h"
-#include "kitty.h"
-
-__at (0xa800) struct kitty_t kitty;
+#include "calc/display.h"
+#include "calc/random.h"
+#include "calc/ram.h"
 
 void init_kitty(void)
 {

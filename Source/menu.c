@@ -6,7 +6,10 @@
 #include "menu.h"
 #include "misc.h"
 #include "moon.h"
-#include "ti86.h"
+#include "calc/display.h"
+#include "calc/input.h"
+#include "calc/random.h"
+#include "calc/timer.h"
 
 extern unsigned char gamestate;
 extern lock_t idle_lock;
@@ -44,7 +47,7 @@ void menusequence(void)
     draw_lander();
     draw_kitty();
     draw_kibbles();
-    flipscreen();
+    updatescreen();
 }
 
 void menu_input(void)
