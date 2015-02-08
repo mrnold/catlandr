@@ -14,6 +14,9 @@ void init_kitty(void)
 {
     kitty.y = 0;
     kitty.x = random16()&0x3FF;
+    if (kitty.x < SCREEN_WIDTH) {
+        kitty.x = SCREEN_WIDTH;
+    }
     kitty.speed.x = 0;
     kitty.speed.y = 0;
     kitty.stage = 0;
