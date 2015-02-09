@@ -10,21 +10,6 @@
 #include "calc/random.h"
 #include "calc/ram.h"
 
-void init_kitty(void)
-{
-    kitty.y = 0;
-    kitty.x = random16()&0x3FF;
-    if (kitty.x < SCREEN_WIDTH) {
-        kitty.x = SCREEN_WIDTH;
-    }
-    kitty.speed.x = 0;
-    kitty.speed.y = 0;
-    kitty.stage = 0;
-    kitty.state = SITTING;
-    kitty.bitmap = &cat_sittingleft;
-    kitty.batting = false;
-}
-
 void draw_kitty(void)
 {
     draw_live_sprite(*kitty.bitmap, kitty.stage, kitty.x, kitty.y, 0, OR);

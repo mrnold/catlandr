@@ -14,6 +14,12 @@ extern __at (LANDER_ADDRESS) struct lander_t lander;
 extern __at (KITTY_ADDRESS) struct kitty_t kitty;
 extern __at (FRAMES_ADDRESS) unsigned int frames;
 extern __at (DROPPED_ADDRESS) unsigned int dropped;
+extern __at (TIME_ADDRESS) unsigned int t;
+extern __at (CAMERA_ADDRESS) unsigned int camera;
+extern __at (PREVCAMERA_ADDRESS) unsigned int previouscamera;
+extern __at (GAMESTATE_ADDRESS) unsigned char gamestate;
+extern __at (LANDINGPAD_ADDRESS) unsigned short landingpad;
+extern __at (TICKS_ADDRESS) unsigned int ticks;
 
 void memset(void *, unsigned char, unsigned short);
 void savescores(void) __naked;

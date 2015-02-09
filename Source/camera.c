@@ -4,15 +4,10 @@
 #include "lander.h"
 #include "moon.h"
 #include "calc/display.h"
+#include "calc/ram.h"
 
-unsigned int camera;
-unsigned int previouscamera;
-
-void init_camera(void)
-{
-    previouscamera = 0;
-    camera = 0;
-}
+__at (CAMERA_ADDRESS) unsigned int camera;
+__at (PREVCAMERA_ADDRESS) unsigned int previouscamera;
 
 void move_camera(void)
 {

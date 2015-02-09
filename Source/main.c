@@ -15,14 +15,14 @@
 #include "calc/random.h"
 #include "calc/timer.h"
 
-unsigned int ticks;
+__at (TICKS_ADDRESS) unsigned int ticks;
 
 void init(void);
 void reset(void);
 void timer_callback(void);
 
-lock_t frame_lock;
-lock_t idle_lock;
+__at (FRAMELOCK_ADDRESS) lock_t frame_lock;
+__at (IDLELOCK_ADDRESS) lock_t idle_lock;
 
 char *loading[] = {
     "Creating lunar surface...",
@@ -66,6 +66,7 @@ quit_program:
 
 void reset(void)
 {
+    unsigned char i;
     ticks = 0;
 
     init_game();

@@ -9,12 +9,7 @@
 #include "calc/ram.h"
 #include "calc/random.h"
 
-unsigned int t; // Time tick to be updated ~25 times/sec
-
-void init_physics(void)
-{
-    t = 0;
-}
+__at (TIME_ADDRESS) unsigned int t; // Time tick to be updated ~25 times/sec
 
 // Note: do this before drawing the lander, but after applying physics
 void collisions(void)

@@ -1,1 +1,2 @@
-void init_calculator(void);
+#define init_calculator() \
+    prerender();

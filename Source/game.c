@@ -15,21 +15,10 @@
 
 unsigned int crashes;
 unsigned int landings;
-unsigned char gamestate;
+__at (GAMESTATE_ADDRESS) unsigned char gamestate;
 
-extern lock_t frame_lock;
-extern lock_t idle_lock;
-
-void init_game(void)
-{
-    frames = 0;
-    dropped = 0;
-}
-
-void force_call(void)
-{
-    moon;
-}
+extern __at (FRAMELOCK_ADDRESS) lock_t frame_lock;
+extern __at (IDLELOCK_ADDRESS) lock_t idle_lock;
 
 void gamesequence(void)
 {
@@ -45,7 +34,6 @@ void gamesequence(void)
     draw_kibbles();
     draw_status();
     updatescreen();
-    force_call();
 }
 
 void loop_game(void)

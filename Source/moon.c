@@ -6,12 +6,7 @@
 #include "calc/ram.h"
 #include "calc/random.h"
 
-unsigned short landingpad;
-
-void init_moon(void)
-{
-    generate_moon();
-}
+__at (LANDINGPAD_ADDRESS) unsigned short landingpad;
 
 void generate_moon(void)
 {

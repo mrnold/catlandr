@@ -8,22 +8,6 @@
 #include "calc/ram.h"
 #include "calc/timer.h"
 
-void init_kibbles(void)
-{
-    unsigned char i;
-    for (i = 0; i < KIBBLE_MAX; i++) {
-        kibbles[i].y = SCREEN_HEIGHT-8;
-        kibbles[i].x = i*KIBBLE_WIDTH+1;
-        kibbles[i].bitmap = &kibble;
-        kibbles[i].stage = 0;
-        kibbles[i].ready = true;
-        kibbles[i].eaten = false;
-        kibbles[i].landed = false;
-        kibbles[i].speed.x = 0;
-        kibbles[i].speed.y = 1;
-    }
-}
-
 void create_kibble(unsigned char index, unsigned short x, unsigned char y, char speedx, char speedy)
 {
     kibbles[index].y = y;
