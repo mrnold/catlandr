@@ -14,3 +14,4 @@ extern __at (LANDER_ADDRESS) struct lander_t lander;
 extern __at (KITTY_ADDRESS) struct kitty_t kitty;
 
 void memset(void *, unsigned char, unsigned short);
+void savescores(void) __naked;

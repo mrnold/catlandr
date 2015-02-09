@@ -102,5 +102,8 @@ void showmenu(void)
         printxy(85, 6,  "to feed Luna!");
         printxy(88, 12, "Thrust up to");
         printxy(88, 18, "get started!");
+        printnumxy(88, 24, landings);
+        print("/");
+        printnum(crashes);
     }
 }

@@ -12,6 +12,13 @@
 #define DIVHLBY10           0x4044
 #define VPUTMAP             0x4aa1
 #define VPUTS               0x4aa5
+#define SET_ABS_DEST_ADDR   0x5285
+#define SET_ABS_SRC_ADDR    0x4647
+#define SET_MM_NUM_BYTES    0x464f
+#define MM_LDIR_SET_SIZE    0x524d
+#define MM_LDIR             0x52ed
+
+#define ASAPVAR             0xd6fc
 
 extern __at (PRERENDER_ADDRESS) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
 extern __at (BACKUPGRAPH_ADDRESS) unsigned char *backupgraph;

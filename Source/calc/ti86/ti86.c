@@ -40,14 +40,36 @@ void memset(void *ptr, unsigned char value, unsigned short count)
     __asm
         ld l, 4(ix)
         ld h, 5(ix)
-        ld e, 4(ix)
-        ld d, 5(ix)
         ld c, 7(ix)
         ld b, 8(ix)
         ld a, 6(ix)
         ld (hl), a
+        ld e, l
+        ld d, h
         inc de
         ldir
+    __endasm;
+}
+
+void savescores(void) __naked
+{
+    __asm
+        di
+        ld hl, #ASAPVAR
+        rst #0x20
+        rst #0x10
+        xor a
+        ld hl,#_crashes-0xd744
+        add hl, de
+        adc a, b
+        call #SET_ABS_DEST_ADDR
+        xor a
+        ld hl, #_crashes
+        call #SET_ABS_SRC_ADDR
+        ld hl, #4
+        call MM_LDIR_SET_SIZE
+        ei
+        ret
     __endasm;
 }
 // End of RAM interface ----------------------------------------------
@@ -195,10 +217,10 @@ void draw_moon(void) __naked
 {
     __asm
         push ix ;// shift amount
-        push bc ;// scr
-        push de ;// pre
-        push hl ;// temps
-        push af ;// math
+        ;//push bc ;// scr
+        ;//push de ;// pre
+        ;//push hl ;// temps
+        ;//push af ;// math
 
         ;// Fast clear upper portions of screen
         ;// that are always zero: top 20 rows (0-19)
@@ -361,10 +383,10 @@ void draw_moon(void) __naked
         jp fdm_loop
     fdm_loop_done:
 
-        pop af
-        pop hl
-        pop de
-        pop bc
+        ;//pop af
+        ;//pop hl
+        ;//pop de
+        ;//pop bc
         pop ix
 
         ret
