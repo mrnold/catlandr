@@ -17,13 +17,6 @@
 #include "random.h"
 #include "timer.h"
 
-// Initialization interface -----------------------------------------
-void init_calculator(void)
-{
-    prerender();
-}
-// End of initialization interface ----------------------------------
-
 // RAM interface - specifies where all the big stuff lives ----------
 __at (PRERENDER_ADDRESS) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
 __at (MOON_ADDRESS) unsigned char moon[MOON_WIDTH];

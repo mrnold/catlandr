@@ -9,10 +9,10 @@
 #include "moon.h"
 #include "calc/display.h"
 #include "calc/input.h"
+#include "calc/ram.h"
 #include "calc/random.h"
 #include "calc/timer.h"
 
-extern unsigned char gamestate;
 extern lock_t idle_lock;
 extern void init(void);
 

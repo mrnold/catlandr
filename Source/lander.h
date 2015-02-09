@@ -43,8 +43,24 @@ struct lander_t {
 };
 
 void draw_lander(void);
-void init_lander(void);
 void move_lander(void);
 void stop_lander(unsigned char);
 
-__at (0xa700) extern struct lander_t lander;
+#define init_lander()                \
+    lander.y = 0;                    \
+    lander.x = SCREEN_WIDTH/2;       \
+    lander.speed.x = 0;              \
+    lander.speed.y = 0;              \
+    lander.acceleration.x = 0;       \
+    lander.acceleration.y = GRAVITY; \
+    lander.bitmap = &img_lander;     \
+    lander.thrust.hp_stage = 0;      \
+    lander.thrust.hp_firing = 0;     \
+    lander.thrust.hn_stage = 0;      \
+    lander.thrust.hn_firing = 0;     \
+    lander.thrust.vp_stage = 0;      \
+    lander.thrust.vp_firing = 0;     \
+    lander.freedom.stopped = false;  \
+    lander.fuel = 255;               \
+    lander.food = KIBBLE_MAX;        \
+    lander.stage = LANDER_FLYING;

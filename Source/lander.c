@@ -9,29 +9,6 @@
 #include "calc/ram.h"
 #include "calc/random.h"
 
-extern unsigned char gamestate;
-
-void init_lander(void)
-{
-    lander.y = 0;
-    lander.x = SCREEN_WIDTH/2;
-    lander.speed.x = 0;
-    lander.speed.y = 0;
-    lander.acceleration.x = 0;
-    lander.acceleration.y = GRAVITY;
-    lander.bitmap = &img_lander;
-    lander.thrust.hp_stage = 0;
-    lander.thrust.hp_firing = 0;
-    lander.thrust.hn_stage = 0;
-    lander.thrust.hn_firing = 0;
-    lander.thrust.vp_stage = 0;
-    lander.thrust.vp_firing = 0;
-    lander.freedom.stopped = false;
-    lander.fuel = 255;
-    lander.food = KIBBLE_MAX;
-    lander.stage = LANDER_FLYING;
-}
-
 void stop_lander(unsigned char state)
 {
     lander.freedom.stopped = false;
