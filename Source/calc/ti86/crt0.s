@@ -5,4 +5,5 @@
    .org 0xD748
    call _main
    im 1
+   call _savescores
    ret

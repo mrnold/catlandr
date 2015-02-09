@@ -3,6 +3,8 @@
 #define KIBBLES_ADDRESS     0xa600
 #define LANDER_ADDRESS      0xa700
 #define KITTY_ADDRESS       0xa800
+#define FRAMES_ADDRESS      0xa900
+#define DROPPED_ADDRESS     0xa910
 #define BACKUPGRAPH_ADDRESS 0xb000
 #define TEXTCOL_ADDRESS     0xc37c
 #define TEXTROW_ADDRESS     0xc37d

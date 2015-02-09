@@ -61,7 +61,6 @@ int main(void)
 quit_program:
     clear_screen();
     restore_graphbuffer();
-    savescores();
     return 0;
 }
 
