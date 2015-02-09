@@ -77,33 +77,19 @@ void menu_input(void)
 
 void showmenu(void)
 {
-    printxy(0, 0,  "EXIT to quit");
-    printxy(0, 6,  "F1 for this menu");
-    printxy(0, 12, "F2 for a new moon");
-    printxy(0, 18, "2ND to drop a kibble");
-    printxy(0, 24, "Arrow keys for thrusters");
+    printhelp();
 
     if (lander.freedom.stopped) {
-        printxy(62, 6, "Successes/Failures");
-        printnumxy(80, 12, landings);
-        print("/");
-        printnum(crashes);
+        printscore();
     }
 
     if (lander.freedom.stuck.crashed) {
-        printxy(87, 18, "Lander");
-        printxy(91, 24, "destroyed!");
+        printdestroyed();
     } else if (lander.freedom.stuck.stranded) {
-        printxy(84, 18, "Out of fuel!");
+        printnogas();
     } else if (lander.freedom.stuck.landed) {
-        printxy(84, 18, "Safe landing!");
+        printvictory();
     } else {
-        printxy(89, 0,  "Land safely");
-        printxy(85, 6,  "to feed Luna!");
-        printxy(88, 12, "Thrust up to");
-        printxy(88, 18, "get started!");
-        printnumxy(88, 24, landings);
-        print("/");
-        printnum(crashes);
+        printgamestart();
     }
 }
