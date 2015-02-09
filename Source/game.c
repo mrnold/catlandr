@@ -123,7 +123,7 @@ void apply_input(void)
     // (without cancelling fuel consumption)
     lander.acceleration.x *= (k6.keys.K_LEFT ^ k6.keys.K_RIGHT);
 
-    if (k6.keys.K_UP) {
+    if (k6.keys.K_UP || k6.keys.K_DOWN) {
         if (lander.acceleration.y > -ACCEL_MAX && lander.y > 0) {
             lander.acceleration.y--;
         }
