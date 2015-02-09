@@ -133,7 +133,7 @@ void move_kitty(void)
         kitty.y = max-KITTY_HEIGHT;
         kitty.speed.y = 0;
         if (kitty.x > camera+SCREEN_WIDTH) {
-            kitty.speed.x = -8;
+            kitty.speed.x = -7;
         } else {
             kitty.speed.x = -4;
         }
@@ -142,7 +142,7 @@ void move_kitty(void)
         kitty.y = max-KITTY_HEIGHT;
         kitty.speed.y = 0;
         if (camera > SCREEN_WIDTH && kitty.x < camera-SCREEN_WIDTH) {
-            kitty.speed.x = 8;
+            kitty.speed.x = 7;
         } else {
             kitty.speed.x = 4;
         }
