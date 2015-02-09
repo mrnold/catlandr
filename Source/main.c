@@ -11,6 +11,7 @@
 #include "physics.h"
 #include "calc/display.h"
 #include "calc/init.h"
+#include "calc/ram.h"
 #include "calc/random.h"
 #include "calc/timer.h"
 
@@ -39,8 +40,6 @@ void init(void)
 
 int main(void)
 {
-    crashes = 0;
-    landings = 0;
     save_graphbuffer();
     clear_screen();
     init();
@@ -62,6 +61,7 @@ int main(void)
 quit_program:
     clear_screen();
     restore_graphbuffer();
+    savescores();
     return 0;
 }
 
