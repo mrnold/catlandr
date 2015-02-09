@@ -30,6 +30,8 @@ __at (MOON_ADDRESS) unsigned char moon[MOON_WIDTH];
 __at (KIBBLES_ADDRESS) struct kibble_t kibbles[KIBBLE_MAX];
 __at (LANDER_ADDRESS) struct lander_t lander;
 __at (KITTY_ADDRESS) struct kitty_t kitty;
+__at (FRAMES_ADDRESS) unsigned int frames;
+__at (DROPPED_ADDRESS) unsigned int dropped;
 __at (BACKUPGRAPH_ADDRESS) unsigned char *backupgraph;
 __at (TEXTCOL_ADDRESS) unsigned char textcol;
 __at (TEXTROW_ADDRESS) unsigned char textrow;
@@ -54,7 +56,6 @@ void memset(void *ptr, unsigned char value, unsigned short count)
 void savescores(void) __naked
 {
     __asm
-        di
         ld hl, #ASAPVAR
         rst #0x20
         rst #0x10
@@ -68,7 +69,6 @@ void savescores(void) __naked
         call #SET_ABS_SRC_ADDR
         ld hl, #4
         call MM_LDIR_SET_SIZE
-        ei
         ret
     __endasm;
 }

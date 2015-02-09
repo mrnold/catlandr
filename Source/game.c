@@ -13,8 +13,6 @@
 #include "calc/ram.h"
 #include "calc/timer.h"
 
-unsigned int frames;
-unsigned int dropped;
 unsigned int crashes;
 unsigned int landings;
 unsigned char gamestate;

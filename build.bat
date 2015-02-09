@@ -124,7 +124,7 @@
 :build
 @mkdir Build\%1 > NUL 2>&1
 @rmdir Build\%1 > NUL 2>&1
-%SDCCBASE% --out-fmt-ihx -o Build\%1.ihx --data-loc 0 --code-loc 0xD74E %LINKS% %1
+%SDCCBASE% --out-fmt-ihx -o Build\%1.ihx --data-loc 0 --code-loc 0xD751 %LINKS% %1
 @goto :done
 
 :failed
