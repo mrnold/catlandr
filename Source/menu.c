@@ -55,7 +55,7 @@ void menu_input(void)
 {
     union keyrow_0 k0;
     union keyrow_6 k6;
-    static union keyrow_6 prev_k6 = {.raw = 0};
+    static __at (PREVKEY6_ADDRESS) union keyrow_6 prev_k6 = {.raw = 0};
 
     scan_row_0(&k0);
     scan_row_6(&k6);
