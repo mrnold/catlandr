@@ -54,9 +54,9 @@ void loop_game(void)
     switch (gamestate) {
     case DONE_STRANDED:
     case DONE_CRASHED:
-        crashes++; break;
+        if (crashes != 0xFFFF) { crashes++; } break;
     case DONE_LANDED:
-        landings++; break;
+        if (landings != 0xFFFF) { landings++; } break;
     default:
     }
 }
@@ -65,7 +65,7 @@ void apply_input(void)
 {
     union keyrow_6 k6;
     union keyrow_0 k0;
-    static union keyrow_0 prev_k0 = {.raw = 0};
+    static __at (PREVKEY0_ADDRESS) union keyrow_0 prev_k0 = {.raw = 0};
 
     if (!lander.freedom.stopped && lander.fuel > 0) {
         scan_row_6(&k6);
