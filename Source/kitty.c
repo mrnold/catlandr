@@ -19,10 +19,10 @@ void move_kitty(void)
 {
     int scratch;
     unsigned int i;
-    static unsigned char countdown;
+    static __at (COUNTDOWN_ADDRESS) unsigned char countdown;
     unsigned char max = SCREEN_HEIGHT;
     unsigned char nextstate = SITTING;
-    static struct kibble_t *kibble = (struct kibble_t *)NULL;
+    static __at (KPT_ADDRESS) struct kibble_t *kibble = (struct kibble_t *)NULL;
 
     // Find highest peak under cat's feet so it can run along the surface
     for (i = kitty.x; i < kitty.x+KITTY_WIDTH; i++) {

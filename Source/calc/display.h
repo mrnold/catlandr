@@ -19,7 +19,7 @@ extern void (*refresh)(void);
 void clear_screen(void) __naked;
 void draw_live_sprite(const unsigned char [8][4], unsigned char, unsigned short, unsigned char, char, char);
 void draw_moon(void) __naked;
-void draw_status(void);
+void draw_status(void) __naked;
 void print(const char * const);
 void printnum(unsigned int);
 void printxy(unsigned char, unsigned char, const char * const);

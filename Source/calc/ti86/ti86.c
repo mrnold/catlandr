@@ -386,7 +386,7 @@ void draw_moon(void) __naked
     __endasm;
 }
 
-void draw_status(void)
+void draw_status(void) __naked
 {
     unsigned char i;
     unsigned char x = lander.fuel>>4;
@@ -399,6 +399,8 @@ void draw_status(void)
         *(screenbuffer+i) = 0xff;
     }
     *(screenbuffer+i) |= ((char)0x80 >> shift);
+
+    __asm__("ret");
 }
 
 static void refresh_sequence(void) __naked;
@@ -482,7 +484,7 @@ void updatescreen(void)
 }
 
 // Internal display interface
-void prerender(void)
+void prerender(void) __naked
 {
     unsigned int j;
     unsigned char i;
@@ -502,6 +504,7 @@ void prerender(void)
             prerendered[i][j>>3] |= (0x80 >> (j&0x07));
         }
     }
+    __asm__("ret");
 }
 
 void save_graphbuffer(void) __naked
