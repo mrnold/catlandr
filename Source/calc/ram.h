@@ -1,6 +1,8 @@
 #ifdef CALCULATOR_MODEL
     #if CALCULATOR_MODEL==86
         #include "ti86/ram.h"
+    #elif CALCULATOR_MODEL==8402
+        #include "ti84pse/ram.h"
     #else
         #error "Invalid calculator model specified!"
     #endif

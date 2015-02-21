@@ -1,3 +1,29 @@
+@if {%1} == {} (
+    @echo Calculator not specified, building for TI-86.
+    @set CRTSIZE=9
+    @set MODEL=86
+    @set BASE=0xD748
+    @set CALC=ti86
+    @set EXT=86p
+) else if {%1} == {86} (
+    @echo Building for TI-86.
+    @set CRTSIZE=9
+    @set MODEL=86
+    @set BASE=0xD748
+    @set CALC=ti86
+    @set EXT=86p
+) else if {%1} == {84pse} (
+    @echo Building for TI-84 Plus Silver Edition.
+    @set CRTSIZE=9
+    @set MODEL=8402
+    @set BASE=0x9D95
+    @set CALC=ti84pse
+    @set EXT=8xp
+) else (
+    @echo Unsupported calculator specified: %1
+    @echo Supported model options: 86 84pse
+    @exit /b
+)
 @rem Check on prerequisites, sdcc >3.4.0 and python
 @if not {%PYTHONDIR%} == {} (
     @if exist %PYTHONDIR%\python.exe (
@@ -70,10 +96,6 @@
 @exit /b
 :sdccok
 
-@if {%CALC%} == {} (
-    @set CALC=ti86
-)
-
 @set SDCC=%SDCCDIR%\sdcc.exe
 @set SDAS=%SDCCDIR%\sdasz80.exe
 @set PYTHON=%PYTHONDIR%\python.exe
@@ -81,10 +103,10 @@
 @set BUILD=@call :build
 @set COMPILE=@call :compile
 @set FAKE=@call :fake
-@set SDCCBASE=%SDCC% -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed -ISource -DCALCULATOR_MODEL=86
+@set SDCCBASE=%SDCC% -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed -ISource -DCALCULATOR_MODEL=%MODEL%
 
 @mkdir Build > NUL 2>&1
-%SDAS% -p -g -o Build\%CALC%_crt0.rel Source\calc\%CALC%\crt0.s
+%SDAS% -p -g -o Build\%CALC%_crt0.rel Source\calc\%CALC%\crt0.s || goto :failed
 
 %COMPILE% Source\bitmap.c || goto :failed
 %COMPILE% Source\camera.c || goto :failed
@@ -103,11 +125,11 @@
 
 @rem Patch the binary to initialize globals. Usually SDCC expects this to be
 @rem done in the startup code, but this is not necessary on a TI.
-%PYTHON% Tools\trim.py Build\Source\main.c.map Build\Source\main.ihx.bin 0xD748
+%PYTHON% Tools\trim.py Build\Source\main.c.map Build\Source\main.ihx.bin %BASE%
 @copy /y Build\Source\main.ihx.bin Build\Source\catlandr.bin
-%PYTHON% Tools\binto86p.py Build\Source\catlandr.bin
+%PYTHON% Tools\binto86p.py %CALC% Build\Source\catlandr.bin
 
-@copy /y Build\Source\catlandr.86p catlandr.86p
+@copy /y Build\Source\catlandr.%EXT% catlandr.%EXT%
 @goto :done
 
 :compile
@@ -124,7 +146,8 @@
 :build
 @mkdir Build\%1 > NUL 2>&1
 @rmdir Build\%1 > NUL 2>&1
-%SDCCBASE% --out-fmt-ihx -o Build\%1.ihx --data-loc 0 --code-loc 0xD751 %LINKS% %1
+@set /a CODELOC=BASE+CRTSIZE
+%SDCCBASE% --out-fmt-ihx -o Build\%1.ihx --data-loc 0 --code-loc %CODELOC% %LINKS% %1
 @goto :done
 
 :failed
