@@ -14,9 +14,9 @@
 #define IDLELOCK_ADDRESS    0xa980
 #define TICKS_ADDRESS       0xa990
 #define PREVKEY0_ADDRESS    0xa9a0
-#define PREVKEY6_ADDRESS    0xa9a0
-#define COUNTDOWN_ADDRESS   0xa9b0
-#define KPT_ADDRESS         0xa9c0
+#define PREVKEY6_ADDRESS    0xa9b0
+#define COUNTDOWN_ADDRESS   0xa9c0
+#define KPT_ADDRESS         0xa9d0
 #define BACKUPGRAPH_ADDRESS 0xb000
 #define TEXTCOL_ADDRESS     0xc37c
 #define TEXTROW_ADDRESS     0xc37d
