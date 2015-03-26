@@ -24,17 +24,18 @@ void timer_callback(void);
 __at (FRAMELOCK_ADDRESS) lock_t frame_lock;
 __at (IDLELOCK_ADDRESS) lock_t idle_lock;
 
-char *loading[] = {
-    "Creating lunar surface...",
-    "Waxing the moon...",
-    "Tranquilizing seas...",
-    "Herding cats..."
+const char * const loading[] = {
+    "Creating lunar surface",
+    "Waxing the moon",
+    "Tranquilizing seas",
+    "Herding cats"
 };
 
 void init(void)
 {
     gamestate = START_MENU;
     printxy(0, 0, loading[random8()%4]);
+    print("...");
     reset();
 }
 
