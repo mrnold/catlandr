@@ -103,7 +103,7 @@
 @set BUILD=@call :build
 @set COMPILE=@call :compile
 @set FAKE=@call :fake
-@set SDCCBASE=%SDCC% -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed -ISource -DCALCULATOR_MODEL=%MODEL%
+@set SDCCBASE=%SDCC% -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node 30000 -ISource -DCALCULATOR_MODEL=%MODEL%
 
 @mkdir Build > NUL 2>&1
 %SDAS% -p -g -o Build\%CALC%_crt0.rel Source\calc\%CALC%\crt0.s || goto :failed
@@ -115,7 +115,7 @@
 %COMPILE% Source\kitty.c || goto :failed
 %COMPILE% Source\lander.c || goto :failed
 %COMPILE% Source\menu.c || goto :failed
-%COMPILE% Source\moon.c || goto :failed
+%COMPILE% Source\moon.c "--max-allocs-per-node 3000" || goto :failed
 %COMPILE% Source\physics.c || goto :failed
 %COMPILE% Source\calc\%CALC%\%CALC%.c || goto :failed
 %BUILD% Source\main.c || goto :failed
@@ -135,7 +135,7 @@
 :compile
 @mkdir Build\%1 > NUL 2>&1
 @rmdir Build\%1 > NUL 2>&1
-%SDCCBASE% -c %1 -o Build\%1.rel
+%SDCCBASE% %2 -c %1 -o Build\%1.rel
 @set LINKS=%LINKS% Build\%1.rel
 @goto :done
 
