@@ -18,16 +18,15 @@
 #include "timer.h"
 
 // RAM interface - specifies where all the big stuff lives ----------
-__at (PRERENDER_ADDRESS) unsigned char prerendered[SCREEN_HEIGHT][(MOON_WIDTH-1)/8];
 __at (MOON_ADDRESS) unsigned char moon[MOON_WIDTH];
 __at (KIBBLES_ADDRESS) struct kibble_t kibbles[KIBBLE_MAX];
 __at (LANDER_ADDRESS) struct lander_t lander;
 __at (KITTY_ADDRESS) struct kitty_t kitty;
 __at (FRAMES_ADDRESS) unsigned int frames;
 __at (DROPPED_ADDRESS) unsigned int dropped;
-__at (BACKUPGRAPH_ADDRESS) unsigned char *backupgraph;
 __at (TEXTCOL_ADDRESS) unsigned char textcol;
 __at (TEXTROW_ADDRESS) unsigned char textrow;
+__at (SCREENBUF_ADDRESS) unsigned char screenbuffer;
 
 void memset(void *ptr, unsigned char value, unsigned short count)
 {
@@ -68,7 +67,6 @@ void setup_timer(void (*callback)(void))
 void timer_isr(void) __naked
 {
     __asm
-        di
         ex af, af'
         exx
         ld hl, #timer_isr_exit
@@ -76,15 +74,8 @@ void timer_isr(void) __naked
         ld hl, (#_callback_function)
         jp (hl)
     timer_isr_exit:
-        in a, (3) ;// TI-86 boilerplate
-        and #0x01 ;// Clear ON key status
-        add a, #0x09
-        out (3), a
-        ld a, #0x0b
-        out (3), a
         ex af, af'
         exx
-        ei
         reti
     __endasm;
 }
@@ -94,19 +85,40 @@ void timer_isr(void) __naked
 void set_timer(void) __naked
 {
     __asm
+        di
+        ld bc, #3
+        ld hl, #jump_timer
+        ld de, #0x9a9a
+        ldir
+
+        ld hl, #0x9900
+        ld de, #0x9901
+        ld (hl), #0x9a
+        ld bc, #256
+        ldir
+        ld a, #0x99
+        ld i, a
+        im 2
+        ei
         ret
+    jump_timer::
+        jp _timer_isr
     __endasm;
 }
 // End of timer interface -------------------------------------------
 
 // Display interface ------------------------------------------------
 void (*refresh)(void);
-__sfr __at 0x00 lcdptr; // Port that tells the LCD where to look
-unsigned char *screenbuffer = SCREENBUF1_ADDRESS; // Off-screen buffer
 
 void clear_screen(void) __naked
 {
     __asm
+        ld hl, #SCREENBUF_ADDRESS
+        xor a
+        ld (hl), a
+        ld bc, #767
+        ld de, #SCREENBUF_ADDRESS+1
+        ldir
         ret
     __endasm;
 }
@@ -116,19 +128,92 @@ void draw_live_sprite(const unsigned char animation[8][4],
         unsigned char frame, unsigned short x, unsigned char y,
         char offset, char mode)
 {
-    return;
+    unsigned int yoffset = y*12;
+
+    unsigned char i, rshift, lshift, imgbyte, *screenbyte, screenx;
+    unsigned int start;
+    int scratch;
+
+    if (x > camera+SCREEN_WIDTH || x+8 < camera) {
+        return;
+    }
+
+    scratch = x-camera+offset;
+    screenx = (unsigned char)scratch;
+
+    rshift = screenx&0x07;
+    lshift = 8-rshift;
+    start = (screenx>>3)+yoffset;
+
+    screenbyte = &screenbuffer+start;
+    if (scratch >= 0 && scratch <= SCREEN_WIDTH-8) {
+        for (i = 0; i < 8; i++) {
+            imgbyte = animation[i][frame];
+            if (mode == OR) {
+                *screenbyte |= (imgbyte >> rshift);
+                *(screenbyte+1) |= (imgbyte << lshift);
+            } else {
+                *screenbyte ^= (imgbyte >> rshift);
+                *(screenbyte+1) ^= (imgbyte << lshift);
+            }
+            screenbyte += 12;
+        }
+    } else if (scratch < 0 && scratch > -8) {
+        screenbyte = &screenbuffer+yoffset;
+        for (i = 0; i < 8; i++) {
+            imgbyte = animation[i][frame];
+            if (mode == OR) {
+                *(screenbyte) |= (imgbyte << lshift);
+            } else {
+                *(screenbyte) ^= (imgbyte << lshift);
+            }
+            screenbyte += 12;
+        }
+    } else if (scratch < SCREEN_WIDTH && scratch+8 > SCREEN_WIDTH) {
+        for (i = 0; i < 8; i++) {
+            imgbyte = animation[i][frame];
+            if (mode == OR) {
+                *screenbyte |= (imgbyte >> rshift);
+            } else {
+                *screenbyte ^= (imgbyte >> rshift);
+            }
+            screenbyte += 12;
+        }
+    }
 }
 
-void draw_moon(void) __naked
+void draw_vertical(unsigned short x, unsigned char height)
 {
-    __asm
-        ret
-    __endasm;
+    unsigned char *i;
+    unsigned char *screen = (unsigned char *)0x9340;
+    unsigned int start = x/8+height*12;
+
+    for (i = screen+start; i < (unsigned char *)0x9640; i += 12) {
+        *i |= (0x80 >> (x%8));
+    }
 }
 
-void draw_status(void) __naked
+void draw_moon(void)
 {
-    __asm__("ret");
+    unsigned int i;
+    for (i = 0; i < SCREEN_WIDTH; i++) {
+        draw_vertical(i, moon[i+camera]);
+    }
+}
+
+void draw_status(void)
+{
+    unsigned char i;
+    unsigned char x = lander.fuel>>2;
+    unsigned char shift = (lander.fuel>>1)&0x07;
+
+    if (lander.fuel == 0) {
+        return;
+    }
+    for (i = 0; i < x; i++) {
+        *(&screenbuffer+i) = 0xff;
+    }
+    *(&screenbuffer+i) |= ((char)0x80 >> shift);
 }
 
 static void refresh_sequence(void) __naked;
@@ -165,9 +250,6 @@ void printnum(unsigned int number)
     if (number == 0) {
         print("0");
     } else {
-        if (screenbuffer == (unsigned char *)SCREENBUF0_ADDRESS) {
-            refresh_sequence();
-        }
         printdigits(number);
     }
 }
@@ -200,13 +282,10 @@ static void printdigits(unsigned int number)
 
 void updatescreen(void)
 {
-    return;
-}
-
-// Internal display interface
-void prerender(void) __naked
-{
-    __asm__("ret");
+    __asm
+        rst #0x28
+        .dw #GRBUFCPY
+    __endasm;
 }
 
 void save_graphbuffer(void) __naked

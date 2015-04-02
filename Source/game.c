@@ -13,8 +13,8 @@
 #include "calc/ram.h"
 #include "calc/timer.h"
 
-unsigned int crashes;
-unsigned int landings;
+unsigned int crashes = 0;
+unsigned int landings = 0;
 __at (GAMESTATE_ADDRESS) unsigned char gamestate;
 
 extern __at (FRAMELOCK_ADDRESS) lock_t frame_lock;

@@ -1,3 +1,5 @@
+#define MOON_WIDTH          1025
+
 #define PRERENDER_ADDRESS   0x8100
 #define MOON_ADDRESS        0xa100
 #define KIBBLES_ADDRESS     0xa600

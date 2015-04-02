@@ -1,2 +1,1 @@
-#define init_calculator() \
-    prerender();
+#define init_calculator() {}

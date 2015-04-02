@@ -14,7 +14,7 @@
     @set EXT=86p
 ) else if {%1} == {84pse} (
     @echo Building for TI-84 Plus Silver Edition.
-    @set CRTSIZE=9
+    @set CRTSIZE=6
     @set MODEL=8402
     @set BASE=0x9D95
     @set CALC=ti84pse
