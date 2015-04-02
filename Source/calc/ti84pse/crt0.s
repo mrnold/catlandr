@@ -5,5 +5,4 @@
    .org 0x9D95
    call _main
    im 1
-   call _savescores
    ret
