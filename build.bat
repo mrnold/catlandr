@@ -1,22 +1,19 @@
 @if {%1} == {} (
     @echo Calculator not specified, building for TI-86.
-    @set CRTSIZE=9
     @set MODEL=86
-    @set BASE=0xD748
+    @set CODELOC=0xD748
     @set CALC=ti86
     @set EXT=86p
 ) else if {%1} == {86} (
     @echo Building for TI-86.
-    @set CRTSIZE=9
     @set MODEL=86
-    @set BASE=0xD748
+    @set CODELOC=0xD748
     @set CALC=ti86
     @set EXT=86p
 ) else if {%1} == {84pse} (
     @echo Building for TI-84 Plus Silver Edition.
-    @set CRTSIZE=6
     @set MODEL=8402
-    @set BASE=0x9D95
+    @set CODELOC=0x9D95
     @set CALC=ti84pse
     @set EXT=8xp
 ) else (
@@ -98,15 +95,17 @@
 
 @set SDCC=%SDCCDIR%\sdcc.exe
 @set SDAS=%SDCCDIR%\sdasz80.exe
+@set SDLD=%SDCCDIR%\sdldz80.exe
 @set PYTHON=%PYTHONDIR%\python.exe
-@set LINKS=Build\%CALC%_crt0.rel
+@set CRT=Build\%CALC%_crt0.rel
+@set LINKS=%CRT%
 @set BUILD=@call :build
 @set COMPILE=@call :compile
 @set FAKE=@call :fake
-@set SDCCBASE=%SDCC% -mz80 --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node 30000 -ISource -DCALCULATOR_MODEL=%MODEL%
+@set SDCCBASE=%SDCC% -mz80 --nostdlib --nostdinc --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node 30000 -ISource -DCALCULATOR_MODEL=%MODEL%
 
 @mkdir Build > NUL 2>&1
-%SDAS% -p -g -o Build\%CALC%_crt0.rel Source\calc\%CALC%\crt0.s || goto :failed
+%SDAS% -p -g -o %CRT% Source\calc\%CALC%\crt0.s || goto :failed
 
 %COMPILE% Source\bitmap.c || goto :failed
 %COMPILE% Source\camera.c || goto :failed
@@ -118,14 +117,15 @@
 %COMPILE% Source\moon.c "--max-allocs-per-node 3000" || goto :failed
 %COMPILE% Source\physics.c || goto :failed
 %COMPILE% Source\calc\%CALC%\%CALC%.c || goto :failed
-%BUILD% Source\main.c || goto :failed
+%COMPILE% Source\main.c || goto :failed
+%BUILD% Build\Source\main.ihx
 
 @rem SDCC generates main.ihx instead of main.c.ihx?
 %PYTHON% Tools\ihxtobin.py Build\Source\main.ihx
 
 @rem Patch the binary to initialize globals. Usually SDCC expects this to be
 @rem done in the startup code, but this is not necessary on a TI.
-%PYTHON% Tools\trim.py Build\Source\main.c.map Build\Source\main.ihx.bin %BASE%
+%PYTHON% Tools\trim.py Build\Source\main.map Build\Source\main.ihx.bin %CODELOC%
 @copy /y Build\Source\main.ihx.bin Build\Source\catlandr.bin
 %PYTHON% Tools\binto86p.py %CALC% Build\Source\catlandr.bin
 
@@ -135,7 +135,7 @@
 :compile
 @mkdir Build\%1 > NUL 2>&1
 @rmdir Build\%1 > NUL 2>&1
-%SDCCBASE% %2 -c %1 -o Build\%1.rel
+%SDCCBASE% %2 --compile-only %1 -o Build\%1.rel
 @set LINKS=%LINKS% Build\%1.rel
 @goto :done
 
@@ -146,8 +146,7 @@
 :build
 @mkdir Build\%1 > NUL 2>&1
 @rmdir Build\%1 > NUL 2>&1
-@set /a CODELOC=BASE+CRTSIZE
-%SDCCBASE% --out-fmt-ihx -o Build\%1.ihx --data-loc 0 --code-loc %CODELOC% %LINKS% %1
+%SDLD% -m -w -x -i -b _CODE=%CODELOC% -b _DATA=0x0000 %1 %LINKS%
 @goto :done
 
 :failed
