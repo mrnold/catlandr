@@ -204,14 +204,13 @@ void draw_moon(void)
 
 void draw_status(void)
 {
-    unsigned char i;
-    unsigned char x = lander.fuel>>2;
-    unsigned char shift = (lander.fuel>>1)&0x07;
+    unsigned char i, x;
+    unsigned char shift = lander.fuel&0x07;
 
     if (lander.fuel == 0) {
         return;
     }
-    for (i = 0; i < x; i++) {
+    for (i = 0, x = 0; x < (lander.fuel&0xf8); i++, x += 8) {
         *(&screenbuffer+i) = 0xff;
     }
     *(&screenbuffer+i) |= ((char)0x80 >> shift);
