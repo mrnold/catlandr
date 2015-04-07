@@ -167,23 +167,21 @@ void draw_live_sprite(const unsigned char animation[8][4],
     }
 }
 
-void draw_vertical(unsigned short x, unsigned char height)
-{
-    unsigned char *i;
-    unsigned char *screen = (unsigned char *)0x9340;
-    unsigned int start = x/8+height*12;
-
-    for (i = screen+start; i < (unsigned char *)0x9640; i += 12) {
-        *i |= (0x80 >> (x%8));
-    }
-}
-
 void draw_moon(void)
 {
     unsigned int i;
+    unsigned char *j;
+    unsigned int start;
+    unsigned int height;
+
     clear_screen();
     for (i = 0; i < SCREEN_WIDTH; i++) {
-        draw_vertical(i, moon[i+camera]);
+        height = (unsigned int)moon[i+camera];
+        start = i/8+height*12;
+        for (j = (unsigned char *)0x9340+start;
+             j < (unsigned char *)0x9640; j += 12) {
+            *j |= (0x80 >> (i%8));
+        }
     }
 }
 
