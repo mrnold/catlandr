@@ -163,7 +163,6 @@ void move_kitty(void)
             kitty.bitmap = &cat_snackingleft;
             if (kitty.state == RUNNING_LEFT) {
                 countdown = 3;
-                kitty.speed.x = 0;
             } else {
                 if ((t&0x07) == 0) {
                     countdown--;
@@ -180,7 +179,6 @@ void move_kitty(void)
             kitty.bitmap = &cat_snackingright;
             if (kitty.state == RUNNING_RIGHT) {
                 countdown = 3;
-                kitty.speed.x = 0;
             } else {
                 if ((t&0x07) == 0) {
                     countdown--;
