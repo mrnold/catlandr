@@ -29,23 +29,6 @@ __at (BACKUPGRAPH_ADDRESS) unsigned char *backupgraph;
 __at (TEXTCOL_ADDRESS) unsigned char textcol;
 __at (TEXTROW_ADDRESS) unsigned char textrow;
 
-void memset(void *ptr, unsigned char value, unsigned short count)
-{
-    ptr, value, count;
-    __asm
-        ld l, 4(ix)
-        ld h, 5(ix)
-        ld c, 7(ix)
-        ld b, 8(ix)
-        ld a, 6(ix)
-        ld (hl), a
-        ld e, l
-        ld d, h
-        inc de
-        ldir
-    __endasm;
-}
-
 void savescores(void) __naked
 {
     __asm

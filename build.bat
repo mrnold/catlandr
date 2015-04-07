@@ -102,7 +102,7 @@
 @set BUILD=@call :build
 @set COMPILE=@call :compile
 @set FAKE=@call :fake
-@set SDCCBASE=%SDCC% -mz80 --nostdlib --nostdinc --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node 30000 -ISource -DCALCULATOR_MODEL=%MODEL%
+@set SDCCBASE=%SDCC% -mz80 --nostdlib --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node 30000 -ISource -DCALCULATOR_MODEL=%MODEL%
 
 @mkdir Build > NUL 2>&1
 %SDAS% -p -g -o %CRT% Source\calc\%CALC%\crt0.s || goto :failed
