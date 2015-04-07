@@ -196,6 +196,7 @@ void draw_vertical(unsigned short x, unsigned char height)
 void draw_moon(void)
 {
     unsigned int i;
+    clear_screen();
     for (i = 0; i < SCREEN_WIDTH; i++) {
         draw_vertical(i, moon[i+camera]);
     }
