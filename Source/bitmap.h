@@ -1,7 +1,4 @@
-#define LANDER_STAGES 4
-#define THRUST_STAGES 4
-#define CAT_RUNSTAGES 4
-#define KIBBLE_FALLSTAGES 4
+#define ANIMATION_STAGES 4
 
 enum lander_stages {
     LANDER_FLYING,
@@ -10,17 +7,17 @@ enum lander_stages {
     LANDER_LEFTCRASH
 };
 
-extern const unsigned char img_lander[][LANDER_STAGES];
-extern const unsigned char img_thrustleft[][THRUST_STAGES];
-extern const unsigned char img_thrustdown[][THRUST_STAGES];
-extern const unsigned char img_thrustright[][THRUST_STAGES];
+extern const unsigned char img_lander[][ANIMATION_STAGES];
+extern const unsigned char img_thrustleft[][ANIMATION_STAGES];
+extern const unsigned char img_thrustdown[][ANIMATION_STAGES];
+extern const unsigned char img_thrustright[][ANIMATION_STAGES];
 
-extern const unsigned char cat_batting[][CAT_RUNSTAGES];
-extern const unsigned char cat_runleft[][CAT_RUNSTAGES];
-extern const unsigned char cat_runright[][CAT_RUNSTAGES];
-extern const unsigned char cat_sittingleft[][CAT_RUNSTAGES];
-extern const unsigned char cat_sittingright[][CAT_RUNSTAGES];
-extern const unsigned char cat_snackingleft[][CAT_RUNSTAGES];
-extern const unsigned char cat_snackingright[][CAT_RUNSTAGES];
+extern const unsigned char cat_batting[][ANIMATION_STAGES];
+extern const unsigned char cat_runleft[][ANIMATION_STAGES];
+extern const unsigned char cat_runright[][ANIMATION_STAGES];
+extern const unsigned char cat_sittingleft[][ANIMATION_STAGES];
+extern const unsigned char cat_sittingright[][ANIMATION_STAGES];
+extern const unsigned char cat_snackingleft[][ANIMATION_STAGES];
+extern const unsigned char cat_snackingright[][ANIMATION_STAGES];
 
-extern const unsigned char kibble[][KIBBLE_FALLSTAGES];
+extern const unsigned char kibble[][ANIMATION_STAGES];

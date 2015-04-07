@@ -3,7 +3,7 @@
 #define SCREENBUF_ADDRESS   0x9340
 #define MOON_ADDRESS        0x86ec
 #define KIBBLES_ADDRESS     0x9872
-#define LANDER_ADDRESS      0x98a9
+#define LANDER_ADDRESS      0x98da
 #define KITTY_ADDRESS       0x98ba
 #define FRAMES_ADDRESS      0x98c4
 #define DROPPED_ADDRESS     0x98c6

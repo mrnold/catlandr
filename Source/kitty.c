@@ -230,7 +230,7 @@ void move_kitty(void)
 
     // Move to next animation 
     if ((t&0x07) == 0) {
-        kitty.stage = (kitty.stage+1)&(CAT_RUNSTAGES-1);
+        kitty.stage++;
     }
 
     // Transition to next state for the next frame

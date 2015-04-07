@@ -99,7 +99,7 @@ void move_kibbles(void)
         }
 
         if ((t&0x07) == 0) {
-            kibbles[i].stage = (kibbles[i].stage+1)&(KIBBLE_FALLSTAGES-1);
+            kibbles[i].stage++;
         }
     }
 }

@@ -78,31 +78,31 @@ void apply_input(void)
         if (lander.acceleration.x < ACCEL_MAX && lander.x < MOON_WIDTH-LANDER_WIDTH-1) {
             lander.acceleration.x++;
         }
-        lander.thrust.hp_firing = true;
+        lander.hp_firing = true;
         if ((t&0x03) == 0) { // Cycle ~6 times/sec
-            lander.thrust.hp_stage++;
+            lander.hp_stage++;
             if (lander.fuel != 0) {
                 lander.fuel--;
             }
         }
     } else {
-        lander.thrust.hp_firing = false;
-        lander.thrust.hp_stage = 0;
+        lander.hp_firing = false;
+        lander.hp_stage = 0;
     }
     if (k6.keys.K_LEFT) {
         if (lander.acceleration.x > -ACCEL_MAX && lander.x > 0) {
             lander.acceleration.x--;
         }
-        lander.thrust.hn_firing = true;
+        lander.hn_firing = true;
         if ((t&0x03) == 0) {
-            lander.thrust.hn_stage++;
+            lander.hn_stage++;
             if (lander.fuel != 0) {
                 lander.fuel--;
             }
         }
     } else {
-        lander.thrust.hn_firing = false;
-        lander.thrust.hn_stage = 0;
+        lander.hn_firing = false;
+        lander.hn_stage = 0;
     }
 
     // If both keys are pressed, cancel each acceleration
@@ -113,9 +113,9 @@ void apply_input(void)
         if (lander.acceleration.y > -ACCEL_MAX && lander.y > 0) {
             lander.acceleration.y--;
         }
-        lander.thrust.vp_firing = true;
+        lander.vp_firing = true;
         if ((t&0x03) == 0) {
-            lander.thrust.vp_stage++;
+            lander.vp_stage++;
             if (lander.fuel != 0) {
                 lander.fuel--;
             }
@@ -124,8 +124,8 @@ void apply_input(void)
         if (!lander.freedom.stuck.crashed) {
             lander.acceleration.y = GRAVITY;
         }
-        lander.thrust.vp_firing = false;
-        lander.thrust.vp_stage = 0;
+        lander.vp_firing = false;
+        lander.vp_stage = 0;
     }
 
     if (k0.keys.K_2ND && !prev_k0.keys.K_2ND && lander.food > 0) {

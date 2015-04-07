@@ -20,14 +20,12 @@ struct lander_t {
     struct {
         char x, y;
     } acceleration;
-    struct {
-        unsigned char hp_stage   : 2; // Horizontal positive
-        unsigned char hp_firing  : 1;
-        unsigned char hn_stage   : 2; // Horizontal negative
-        unsigned char hn_firing  : 1;
-        unsigned char vp_stage   : 2; // Vertical positive (screen down)
-        unsigned char vp_firing  : 1;
-    } thrust;
+    unsigned char hp_stage; // Horizontal positive
+    unsigned char hp_firing;
+    unsigned char hn_stage; // Horizontal negative
+    unsigned char hn_firing;
+    unsigned char vp_stage; // Vertical positive (screen down)
+    unsigned char vp_firing;
     union {
         struct {
             unsigned char stranded : 1;
@@ -36,7 +34,7 @@ struct lander_t {
         } stuck;
         unsigned char stopped;
     } freedom;
-    const unsigned char (*bitmap)[][LANDER_STAGES];
+    const unsigned char (*bitmap)[][ANIMATION_STAGES];
     unsigned char stage;
     unsigned char fuel;
     unsigned char food;
@@ -54,12 +52,12 @@ void stop_lander(unsigned char);
     lander.acceleration.x = 0;       \
     lander.acceleration.y = GRAVITY; \
     lander.bitmap = &img_lander;     \
-    lander.thrust.hp_stage = 0;      \
-    lander.thrust.hp_firing = 0;     \
-    lander.thrust.hn_stage = 0;      \
-    lander.thrust.hn_firing = 0;     \
-    lander.thrust.vp_stage = 0;      \
-    lander.thrust.vp_firing = 0;     \
+    lander.hp_stage = 0;      \
+    lander.hp_firing = 0;     \
+    lander.hn_stage = 0;      \
+    lander.hn_firing = 0;     \
+    lander.vp_stage = 0;      \
+    lander.vp_firing = 0;     \
     lander.freedom.stopped = false;  \
     lander.food = KIBBLE_MAX;        \
     lander.stage = LANDER_FLYING;

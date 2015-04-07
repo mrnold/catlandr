@@ -26,9 +26,9 @@ void stop_lander(unsigned char state)
             gamestate = DONE_LANDED;
             break;
     }
-    lander.thrust.hp_firing = false;
-    lander.thrust.hn_firing = false;
-    lander.thrust.vp_firing = false;
+    lander.hp_firing = false;
+    lander.hn_firing = false;
+    lander.vp_firing = false;
     lander.acceleration.x = 0;
     lander.acceleration.y = 0;
     lander.speed.x = 0;
@@ -127,15 +127,15 @@ void draw_lander(void)
 {
     draw_live_sprite(*(lander.bitmap), lander.stage, lander.x, lander.y, 0, OR);
 
-    if (lander.thrust.hp_firing) { // Draw left thruster
-        draw_live_sprite(img_thrustleft, lander.thrust.hp_stage, lander.x, lander.y, -8, OR);
+    if (lander.hp_firing) { // Draw left thruster
+        draw_live_sprite(img_thrustleft, lander.hp_stage, lander.x, lander.y, -8, OR);
     }
 
-    if (lander.thrust.hn_firing) { // Draw right thruster
-        draw_live_sprite(img_thrustright, lander.thrust.hn_stage, lander.x, lander.y, 8, OR);
+    if (lander.hn_firing) { // Draw right thruster
+        draw_live_sprite(img_thrustright, lander.hn_stage, lander.x, lander.y, 8, OR);
     }
 
-    if (lander.thrust.vp_firing) {
-        draw_live_sprite(img_thrustdown, lander.thrust.vp_stage, lander.x, lander.y+8, 0, OR);
+    if (lander.vp_firing) {
+        draw_live_sprite(img_thrustdown, lander.vp_stage, lander.x, lander.y+8, 0, OR);
     }
 }
