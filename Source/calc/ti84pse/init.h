@@ -1,1 +1,2 @@
-#define init_calculator() {}
+#define init_calculator() \
+    lander.fuel = 96;

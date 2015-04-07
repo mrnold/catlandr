@@ -61,6 +61,5 @@ void stop_lander(unsigned char);
     lander.thrust.vp_stage = 0;      \
     lander.thrust.vp_firing = 0;     \
     lander.freedom.stopped = false;  \
-    lander.fuel = 255;               \
     lander.food = KIBBLE_MAX;        \
     lander.stage = LANDER_FLYING;
