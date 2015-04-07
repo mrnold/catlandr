@@ -23,5 +23,4 @@ extern __at (GAMESTATE_ADDRESS) unsigned char gamestate;
 extern __at (LANDINGPAD_ADDRESS) unsigned short landingpad;
 extern __at (TICKS_ADDRESS) unsigned int ticks;
 
-void memset(void *, unsigned char, unsigned short);
 void savescores(void) __naked;
