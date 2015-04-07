@@ -51,8 +51,8 @@ void collisions(void)
     }
 
     // Check if we are about to run into the side of a hill
+    feet = lander.previous.y+LANDER_HEIGHT;
     if (lander.speed.x > 0) {
-        feet = lander.previous.y+LANDER_HEIGHT;
         for (i = lander.previous.x+LANDER_WIDTH; i < lander.previous.x+LANDER_WIDTH+lander.speed.x; i++) {
             if (i > MOON_WIDTH-1) {
                 break;
@@ -75,7 +75,6 @@ void collisions(void)
             }
         }
     } else if (lander.speed.x < 0) { // Same but from the right
-        feet = lander.previous.y+LANDER_HEIGHT;
         for (i = lander.previous.x; i > lander.previous.x+lander.speed.x; i--) {
             if (i > lander.previous.x) {
                 break;
