@@ -1,6 +1,6 @@
 #include "bitmap.h"
 
-const unsigned char img_lander[][LANDER_STAGES] = {
+const unsigned char img_lander[][ANIMATION_STAGES] = {
     { 0b00011000, 0b10000001, 0b01000010, 0b00100100 },
     { 0b01111110, 0b01000010, 0b00100100, 0b00010010 },
     { 0b11100111, 0b10000001, 0b01000010, 0b00100100 },
@@ -11,7 +11,7 @@ const unsigned char img_lander[][LANDER_STAGES] = {
     { 0b11011011, 0b11001010, 0b00110011, 0b11110010 }
 };
 
-const unsigned char img_thrustright[][THRUST_STAGES] = {
+const unsigned char img_thrustright[][ANIMATION_STAGES] = {
     { 0b00000000, 0b00000000, 0b00100000, 0b01110000 },
     { 0b00000000, 0b01100000, 0b01111000, 0b11011100 },
     { 0b11101010, 0b10111010, 0b10011110, 0b10001111 },
@@ -22,7 +22,7 @@ const unsigned char img_thrustright[][THRUST_STAGES] = {
     { 0b00000000, 0b00000000, 0b00000000, 0b00000000 }
 };
 
-const unsigned char img_thrustleft[][THRUST_STAGES] = {
+const unsigned char img_thrustleft[][ANIMATION_STAGES] = {
     { 0b00000000, 0b00000000, 0b00000100, 0b00001110 },
     { 0b00000000, 0b00000110, 0b00011110, 0b00111011 },
     { 0b01010111, 0b01011101, 0b01111001, 0b11110001 },
@@ -33,7 +33,7 @@ const unsigned char img_thrustleft[][THRUST_STAGES] = {
     { 0b00000000, 0b00000000, 0b00000000, 0b00000000 }
 };
 
-const unsigned char img_thrustdown[][THRUST_STAGES] = {
+const unsigned char img_thrustdown[][ANIMATION_STAGES] = {
     { 0b00011000, 0b00011000, 0b00011000, 0b00111100 },
     { 0b00111100, 0b00111100, 0b01100110, 0b01100110 },
     { 0b00011000, 0b00111100, 0b00100100, 0b11000011 },
@@ -44,7 +44,7 @@ const unsigned char img_thrustdown[][THRUST_STAGES] = {
     { 0b00010000, 0b00001000, 0b00010000, 0b00011000 }
 };
 
-const unsigned char cat_runright[][CAT_RUNSTAGES] = {
+const unsigned char cat_runright[][ANIMATION_STAGES] = {
     { 0b00000000, 0b00000000, 0b00000000, 0b00000000 },
     { 0b00000000, 0b00000100, 0b10001000, 0b01001000 },
     { 0b01000100, 0b01000111, 0b10000111, 0b10000111 },
@@ -55,7 +55,7 @@ const unsigned char cat_runright[][CAT_RUNSTAGES] = {
     { 0b10101010, 0b01000010, 0b10000001, 0b00101000 }
 };
 
-const unsigned char cat_runleft[][CAT_RUNSTAGES] = {
+const unsigned char cat_runleft[][ANIMATION_STAGES] = {
     { 0b00000000, 0b00000000, 0b00000000, 0b00000000 },
     { 0b00000000, 0b00100000, 0b00010001, 0b00010010 },
     { 0b00100010, 0b11100010, 0b11100001, 0b11100001 },
@@ -66,7 +66,7 @@ const unsigned char cat_runleft[][CAT_RUNSTAGES] = {
     { 0b01010101, 0b01000010, 0b10000001, 0b00010100 }
 };
 
-const unsigned char cat_sittingleft[][CAT_RUNSTAGES] = {
+const unsigned char cat_sittingleft[][ANIMATION_STAGES] = {
     { 0b00000010, 0b00000010, 0b00000011, 0b00000010 },
     { 0b10010101, 0b10010001, 0b01010010, 0b10010010 },
     { 0b01110001, 0b01110001, 0b01110001, 0b01110001 },
@@ -77,7 +77,7 @@ const unsigned char cat_sittingleft[][CAT_RUNSTAGES] = {
     { 0b01110110, 0b01110110, 0b01110110, 0b01110110 }
 };
 
-const unsigned char cat_sittingright[][CAT_RUNSTAGES] = {
+const unsigned char cat_sittingright[][ANIMATION_STAGES] = {
     { 0b01000000, 0b01000000, 0b11000000, 0b01000000 },
     { 0b10101001, 0b10001001, 0b01001010, 0b01001001 },
     { 0b10001110, 0b10001110, 0b10001110, 0b10001110 },
@@ -88,7 +88,7 @@ const unsigned char cat_sittingright[][CAT_RUNSTAGES] = {
     { 0b01101110, 0b01101110, 0b01101110, 0b01101110 }
 };
 
-const unsigned char cat_snackingright[][CAT_RUNSTAGES] = {
+const unsigned char cat_snackingright[][ANIMATION_STAGES] = {
     { 0b01000000, 0b01000000, 0b11000000, 0b01000000 },
     { 0b10100000, 0b10000000, 0b01000000, 0b01000000 },
     { 0b10001000, 0b10000100, 0b10000010, 0b10000100 },
@@ -99,7 +99,7 @@ const unsigned char cat_snackingright[][CAT_RUNSTAGES] = {
     { 0b11101100, 0b11101100, 0b11101100, 0b11101100 }
 };
 
-const unsigned char cat_snackingleft[][CAT_RUNSTAGES] = {
+const unsigned char cat_snackingleft[][ANIMATION_STAGES] = {
     { 0b00000010, 0b00000010, 0b00000011, 0b00000010 },
     { 0b00000101, 0b00000001, 0b00000010, 0b00000010 },
     { 0b00010001, 0b00100001, 0b01000001, 0b00100001 },
@@ -110,7 +110,7 @@ const unsigned char cat_snackingleft[][CAT_RUNSTAGES] = {
     { 0b00110111, 0b00110111, 0b00110111, 0b00110111 }
 };
 
-const unsigned char cat_batting[][CAT_RUNSTAGES] = {
+const unsigned char cat_batting[][ANIMATION_STAGES] = {
     { 0b00000000, 0b00000000, 0b00000000, 0b00000100 },
     { 0b00000000, 0b10101000, 0b00000000, 0b00101100 },
     { 0b00101000, 0b10111000, 0b00101000, 0b00111100 },
@@ -121,7 +121,7 @@ const unsigned char cat_batting[][CAT_RUNSTAGES] = {
     { 0b11111110, 0b11000110, 0b11111110, 0b11000110 }
 };
 
-const unsigned char kibble[][KIBBLE_FALLSTAGES] = {
+const unsigned char kibble[][ANIMATION_STAGES] = {
     { 0b00000000, 0b11100000, 0b00000000, 0b00010000 },
     { 0b00000000, 0b10010000, 0b00000000, 0b00011000 },
     { 0b00000000, 0b10011000, 0b00000000, 0b00010100 },

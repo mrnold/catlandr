@@ -8,7 +8,7 @@ struct kibble_t {
     struct {
         char x, y;
     } speed;
-    const unsigned char (*bitmap)[][KIBBLE_FALLSTAGES];
+    const unsigned char (*bitmap)[][ANIMATION_STAGES];
     unsigned char stage;
     unsigned char ready;
     unsigned char eaten;
