@@ -17,12 +17,11 @@ void collisions(void)
     unsigned int i;
     unsigned char max;
     unsigned char same;
-    unsigned int edge = lander.x+LANDER_WIDTH;
     unsigned char feet = lander.y+LANDER_HEIGHT;
 
     same = true; // Look for a flat landing surface underfoot
     max = moon[lander.x];
-    for (i = lander.x+1; i < edge; i++) {
+    for (i = lander.x+1; i < lander.x+LANDER_WIDTH; i++) {
         if (moon[i] != moon[i-1]) {
             same = false;
         }
@@ -39,7 +38,7 @@ void collisions(void)
             return;
         }
         if (same) { // Found a flat spot! Make sure we didn't land too hard
-            if (lander.x >= landingpad && edge <= landingpad+LANDINGPAD_WIDTH) {
+            if (lander.x >= landingpad && lander.x+LANDER_WIDTH <= landingpad+LANDINGPAD_WIDTH) {
                 stop_lander(LANDED); // Victory!
             }
             return;
@@ -54,8 +53,7 @@ void collisions(void)
     // Check if we are about to run into the side of a hill
     if (lander.speed.x > 0) {
         feet = lander.previous.y+LANDER_HEIGHT;
-        edge = lander.previous.x+LANDER_WIDTH;
-        for (i = edge; i < edge+lander.speed.x; i++) {
+        for (i = lander.previous.x+LANDER_WIDTH; i < lander.previous.x+LANDER_WIDTH+lander.speed.x; i++) {
             if (i > MOON_WIDTH-1) {
                 break;
             }
@@ -78,9 +76,8 @@ void collisions(void)
         }
     } else if (lander.speed.x < 0) { // Same but from the right
         feet = lander.previous.y+LANDER_HEIGHT;
-        edge = lander.previous.x;
-        for (i = edge; i > edge+lander.speed.x; i--) {
-            if (i > edge) {
+        for (i = lander.previous.x; i > lander.previous.x+lander.speed.x; i--) {
+            if (i > lander.previous.x) {
                 break;
             }
             if (moon[i] < feet) {
@@ -91,7 +88,7 @@ void collisions(void)
                     lander.y = lander.previous.y;
                     return;
                 } else {
-                    lander.x = edge;
+                    lander.x = lander.previous.x;
                     lander.acceleration.x = 0;
                     lander.speed.x = -1*(lander.speed.x>>1);
                     if (lander.speed.x < 1) {
