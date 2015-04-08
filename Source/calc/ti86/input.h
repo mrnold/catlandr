@@ -1,3 +1,8 @@
+#define K_KIBBLE keys.K_2ND
+#define K_MENU   keys.K_F1
+#define K_MOON   keys.K_F2
+#define K_QUIT   keys.K_EXIT
+
 union keyrow_0 {
     struct {
         unsigned char K_F5   : 1;

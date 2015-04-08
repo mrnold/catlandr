@@ -2,7 +2,7 @@
 #define SCREEN_HEIGHT 64
 
 #define printhelp()                             \
-    printxy(0, 0,  "MODE to quit");             \
+    printxy(0, 0,  "DEL to quit");             \
     printxy(0, 6,  "Y= for this menu");         \
     printxy(0, 12, "WINDOW for a new moon");    \
     printxy(0, 18, "2ND to drop a treat");      \

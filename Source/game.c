@@ -128,15 +128,15 @@ void apply_input(void)
         lander.vp_stage = 0;
     }
 
-    if (k0.keys.K_2ND && !prev_k0.keys.K_2ND && lander.food > 0) {
+    if (k0.K_KIBBLE && !prev_k0.K_KIBBLE && lander.food > 0) {
         lander.food--;
         create_kibble(lander.food, lander.x, lander.y, lander.speed.x, lander.speed.y);
     }
 
-    if (k0.keys.K_EXIT) {
+    if (k0.K_QUIT) {
         gamestate = EXIT;
     }
-    if (k0.keys.K_F1) {
+    if (k0.K_MENU) {
         gamestate = START_MENU;
     }
 
