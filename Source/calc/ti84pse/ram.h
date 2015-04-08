@@ -27,3 +27,4 @@
 #define DIVHLBY10           0x400f
 #define VPUTMAP             0x455e
 #define VPUTS               0x4561
+#define CHKFINDSYM          0x42f1
