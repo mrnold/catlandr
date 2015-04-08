@@ -1,13 +1,18 @@
+#define K_KIBBLE keys.K_2ND
+#define K_MENU   keys.K_YEQ
+#define K_MOON   keys.K_WINDOW
+#define K_QUIT   keys.K_DEL
+
 union keyrow_0 {
     struct {
-        unsigned char K_F5   : 1;
-        unsigned char K_F4   : 1;
-        unsigned char K_F3   : 1;
-        unsigned char K_F2   : 1;
-        unsigned char K_F1   : 1;
-        unsigned char K_2ND  : 1;
-        unsigned char K_EXIT : 1;
-        unsigned char K_MORE : 1;
+        unsigned char K_GRAPH  : 1;
+        unsigned char K_TRACE  : 1;
+        unsigned char K_ZOOM   : 1;
+        unsigned char K_WINDOW : 1;
+        unsigned char K_YEQ    : 1;
+        unsigned char K_2ND    : 1;
+        unsigned char K_MODE   : 1;
+        unsigned char K_DEL    : 1;
     } keys;
     unsigned char raw;
 };

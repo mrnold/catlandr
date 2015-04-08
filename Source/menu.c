@@ -60,7 +60,7 @@ void menu_input(void)
     scan_row_0(&k0);
     scan_row_6(&k6);
 
-    if (k0.keys.K_EXIT) {
+    if (k0.K_QUIT) {
         gamestate = EXIT;
     }
 
@@ -68,7 +68,7 @@ void menu_input(void)
         gamestate = GAME_RUNNING;
     }
 
-    if (k0.keys.K_F2) {
+    if (k0.K_MOON) {
         gamestate = GAME_RESET;
     }
 

@@ -312,7 +312,8 @@ void save_graphbuffer(void) __naked
 void restore_graphbuffer(void) __naked
 {
     __asm
-        ret
+        rst #0x28
+        .dw #CLRLCDFULL
     __endasm;
 }
 // End of display interface -----------------------------------------
