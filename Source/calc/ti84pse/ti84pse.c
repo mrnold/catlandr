@@ -243,7 +243,8 @@ static void printdigits(unsigned int number)
         ld h, 5(ix)
         ld b, #5
     printnumxygetdigits:
-        call #DIVHLBY10 ;// _divHLby10, remainder in A
+        rst #0x28
+        .dw #DIVHLBY10 ;// _divHLby10, remainder in A
         push af
         djnz printnumxygetdigits
         ld b, #5
@@ -256,7 +257,8 @@ static void printdigits(unsigned int number)
         pop af
     printnumxyprintdigitsskip:
         add #0x30    ;// Add ASCII numbers offset
-        call #VPUTMAP
+        rst #0x28
+        .dw #VPUTMAP
         djnz printnumxyprintdigits
     __endasm;
 }
