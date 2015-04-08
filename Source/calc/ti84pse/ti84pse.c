@@ -31,6 +31,18 @@ __at (SCREENBUF_ADDRESS) unsigned char screenbuffer;
 void savescores(void) __naked
 {
     __asm
+        rst #0x28
+        .dw #CHKFINDSYM ;// DE now has program address
+        xor a
+        cp b
+        jr nz, savescores_exit ;// Archived, do not save
+        ld hl, #_crashes-0x9d95+4 ;// Relative offset of data
+        add hl, de
+        ex de, hl ;// DE now has address of crashes in filesystem
+        ld hl, #_crashes
+        ld bc, #4
+        ldir
+    savescores_exit:
         ret
     __endasm;
 }
