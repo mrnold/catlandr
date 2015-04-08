@@ -174,7 +174,6 @@ void draw_moon(void)
     unsigned int start;
     unsigned int height;
 
-    clear_screen();
     for (i = 0; i < SCREEN_WIDTH; i++) {
         height = (unsigned int)moon[i+camera];
         start = i/8+height*12;
@@ -283,6 +282,7 @@ void updatescreen(void) __naked
         ld b, #64
     row:
         ld a, (hl)
+        ld (hl), #0
     rowwait:
         .dw #0x70ed ;//in f, (c)
         jp m, rowwait
