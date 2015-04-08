@@ -263,11 +263,41 @@ static void printdigits(unsigned int number)
     __endasm;
 }
 
-void updatescreen(void)
+void updatescreen(void) __naked
 {
     __asm
-        rst #0x28
-        .dw #GRBUFCPY
+        ld hl, #0x9340
+        ld c, #0x10
+        ld a, #0x80
+    setrow:
+        .dw #0x70ed ;//in f, (c)
+        jp m, setrow
+        out (#0x10), a
+        ld de, #12
+        ld a, #0x20
+    col:
+        .dw #0x70ed ;//in f, (c)
+        jp m, col
+        out (#0x10), a
+        push af
+        ld b, #64
+    row:
+        ld a, (hl)
+    rowwait:
+        .dw #0x70ed ;//in f, (c)
+        jp m, rowwait
+        out (#0x11), a
+        add hl, de
+        djnz row
+        pop af
+        dec h
+        dec h
+        dec h
+        inc hl
+        inc a
+        cp #0x2c
+        jp nz, col
+        ret
     __endasm;
 }
 
