@@ -198,7 +198,6 @@ void draw_status(void)
     *(&screenbuffer+i) |= ((char)0x80 >> shift);
 }
 
-static void refresh_sequence(void) __naked;
 void printxy(unsigned char col, unsigned char row, const char * const string)
 {
     string;
@@ -311,18 +310,6 @@ void save_graphbuffer(void) __naked
 void restore_graphbuffer(void) __naked
 {
     __asm
-        ret
-    __endasm;
-}
-
-static void refresh_sequence(void) __naked
-{
-    __asm
-        ld hl, #refresh_sequence_done
-        push hl
-        ld hl, (#_refresh)
-        jp (hl)
-    refresh_sequence_done:
         ret
     __endasm;
 }
