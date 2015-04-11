@@ -10,5 +10,6 @@
     #error No calculator model defined!
 #endif
 
+#define restore_timer() __asm__("im 1")
 void setup_timer(void (*)(void));
 void timer_isr(void) __naked;

@@ -6,8 +6,6 @@
    _startup:
       call _gsinit
       call _main
-      im 1
-      call _savescores
       ret
    .area _GSINIT
    _gsinit:
