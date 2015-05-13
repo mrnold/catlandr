@@ -145,6 +145,8 @@ void draw_live_sprite(const unsigned char animation[8][4],
         return;
     }
 
+    frame &= (ANIMATION_STAGES-1);
+
     scratch = x-camera+offset;
     screenx = (unsigned char)scratch;
 
