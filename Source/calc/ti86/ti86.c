@@ -67,6 +67,9 @@ void timer_isr(void) __naked
         di
         ex af, af'
         exx
+        in a, (3)
+        rra
+        jr c, timer_isr_exit
         ld hl, #timer_isr_exit
         push hl
         ld hl, (#_callback_function)
