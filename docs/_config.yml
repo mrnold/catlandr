@@ -1,0 +1,11 @@
+title: catlandr
+description: >-
+  A Lunar Lander-style game for TI86/TI84+ graphing calculators.
+url: "mrnold.github.io/catlandr"
+github_username:  mrnold
+
+# Build settings
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed
