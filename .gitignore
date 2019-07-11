@@ -1,4 +1,3 @@
-syntax: glob
-Build/*
-luna.86p
+bin
+Build
 catlandr.8*p
