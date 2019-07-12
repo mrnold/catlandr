@@ -5,10 +5,10 @@ PYTHON := python
 
 CODELOC86 := 0xD748
 
-all: bin/catlandr.86p
+all: catlandr.86p
 
-bin/catlandr.86p: bin/86/catlandr.bin
-	$(PYTHON) tools/binto86p.py 86 bin/86/catlandr.bin
+catlandr.86p: bin/86/catlandr.bin
+	$(PYTHON) tools/binto86p.py 86 bin/86/catlandr.bin $@
 
 bin/86/catlandr.bin: bin/86/main.ihx
 	$(PYTHON) tools/ihxtobin.py $^
@@ -36,4 +36,4 @@ bin/%.rel: source/%.c
 	$(SDCC) --compile-only -mz80 --nostdlib --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node 300 -Isource -DCALCULATOR_MODEL=86 $^ -o $@
 
 clean:
-	rm -rf bin
+	rm -rf bin catlandr.86p
