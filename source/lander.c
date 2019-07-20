@@ -38,7 +38,7 @@ void stop_lander(unsigned char state)
 void move_lander(void)
 {
     int scratch;
-    char rand;
+    signed char rand;
 
     lander.previous.x = lander.x;
     lander.previous.y = lander.y;
@@ -53,7 +53,7 @@ void move_lander(void)
         if (kitty.y >= lander.y && kitty.y <= lander.y+LANDER_HEIGHT) { // Hit!
             if (kitty.speed.x == 0 && kitty.speed.y == 0) {
                 lander.speed.y = -SPEED_MAX; // Bat lander upwards
-                rand = (char)((random8()<<1)&0x82);
+                rand = (signed char)((random8()<<1)&0x82);
                 if (rand > 0) {
                     lander.speed.x = SPEED_MAX;
                 } else if (rand < 0) {

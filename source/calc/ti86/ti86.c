@@ -136,7 +136,7 @@ void clear_screen(void) __naked
 // World x, not screen x.
 void draw_live_sprite(const unsigned char animation[8][4],
         unsigned char frame, unsigned short x, unsigned char y,
-        char offset, char mode)
+        signed char offset, signed char mode)
 {
     unsigned int yoffset = y<<4;
 
@@ -386,11 +386,11 @@ void draw_status(void)
     for (i = 0; i < x; i++) {
         *(screenbuffer+i) = 0xff;
     }
-    *(screenbuffer+i) |= ((char)0x80 >> shift);
+    *(screenbuffer+i) |= ((signed char)0x80 >> shift);
 }
 
 static void refresh_sequence(void) __naked;
-void printxy(unsigned char col, unsigned char row, const char * const string)
+void printxy(unsigned char col, unsigned char row, const signed char * const string)
 {
     string;
     textcol = col;
@@ -398,7 +398,7 @@ void printxy(unsigned char col, unsigned char row, const char * const string)
     print(string);
 }
 
-void print(const char * const string)
+void print(const signed char * const string)
 {
     string;
     if (screenbuffer == (unsigned char *)SCREENBUF0_ADDRESS) {

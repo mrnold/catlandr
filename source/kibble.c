@@ -8,7 +8,7 @@
 #include "calc/ram.h"
 #include "calc/timer.h"
 
-void create_kibble(unsigned char index, unsigned short x, unsigned char y, char speedx, char speedy)
+void create_kibble(unsigned char index, unsigned short x, unsigned char y, signed char speedx, signed char speedy)
 {
     kibbles[index].y = y;
     kibbles[index].x = x;

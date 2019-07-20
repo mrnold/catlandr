@@ -19,8 +19,8 @@ struct kitty_t {
     unsigned char stage;
     unsigned char batting;
     struct {
-        char x;
-        char y;
+        signed char x;
+        signed char y;
     } speed;
 };
 

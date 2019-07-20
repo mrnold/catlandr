@@ -28,7 +28,9 @@ CODELOC84pse := 0x9D95
 OBJ_CALCS := $(addprefix $(OBJ)/, $(CALCS))
 BIN_CALCS := $(addprefix $(BIN)/, $(CALCS))
 
-ALLOCS = 3000
+ALLOCS := 3000
+
+SDCCFLAGS := --compile-only -mz80 --nostdlib --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node $(ALLOCS) -Isource
 
 .PHONY: all $(CALCS)
 
@@ -65,13 +67,13 @@ $(addsuffix /main.ihx, $(OBJ_CALCS)): $(OBJ)/%/main.ihx: $(OBJ)/%/crt0.rel $(add
 	$(SDLD) -m -w -x -i -b _CODE=$(CODELOC$*) -b _DATA=0x0000 $@ $^
 
 $(addsuffix /ti.rel, $(OBJ_CALCS)): $(OBJ)/%/ti.rel: source/calc/ti%/ti$$*.c | $(OBJ)/$$*
-	$(SDCC) --compile-only -mz80 --nostdlib --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node $(ALLOCS) -Isource -DCALCULATOR_MODEL=$(MODEL$*) $< -o $@
+	$(SDCC) $(SDCCFLAGS) -DCALCULATOR_MODEL=$(MODEL$*) $< -o $@
 
 $(addsuffix /crt0.rel, $(OBJ_CALCS)): $(OBJ)/%/crt0.rel: source/calc/ti%/crt0.s | $(OBJ)/$$*
 	$(SDAS) -p -g -o $@ $<
 
 $(foreach calc, $(CALCS), $(addsuffix .rel, $(addprefix $(OBJ)/$(calc)/, $(SOURCES)))): %.rel : source/$$(notdir %).c | $(OBJ_CALCS)
-	$(SDCC) --compile-only -mz80 --nostdlib --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node $(ALLOCS) -Isource -DCALCULATOR_MODEL=$(MODEL$(subst /$(notdir $@),,$(subst $(OBJ)/,,$@))) $^ -o $@
+	$(SDCC) $(SDCCFLAGS) -DCALCULATOR_MODEL=$(MODEL$(subst /$(notdir $@),,$(subst $(OBJ)/,,$@))) $^ -o $@
 
 clean:
 	$(RMDIR) $(BIN)

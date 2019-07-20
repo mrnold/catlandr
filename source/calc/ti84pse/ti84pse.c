@@ -121,7 +121,7 @@ void clear_screen(void) __naked
 // World x, not screen x.
 void draw_live_sprite(const unsigned char animation[8][4],
         unsigned char frame, unsigned short x, unsigned char y,
-        char offset, char mode)
+        signed char offset, signed char mode)
 {
     unsigned int yoffset = y*12;
 
@@ -207,10 +207,10 @@ void draw_status(void)
     for (i = 0, x = 0; x < (lander.fuel&0xf8); i++, x += 8) {
         *(&screenbuffer+i) = 0xff;
     }
-    *(&screenbuffer+i) |= ((char)0x80 >> shift);
+    *(&screenbuffer+i) |= ((signed char)0x80 >> shift);
 }
 
-void printxy(unsigned char col, unsigned char row, const char * const string)
+void printxy(unsigned char col, unsigned char row, const signed char * const string)
 {
     string;
     textcol = col;
@@ -218,7 +218,7 @@ void printxy(unsigned char col, unsigned char row, const char * const string)
     print(string);
 }
 
-void print(const char * const string)
+void print(const signed char * const string)
 {
     string;
     __asm

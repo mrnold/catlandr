@@ -6,7 +6,8 @@ struct kibble_t {
     unsigned short x;
     unsigned char y;
     struct {
-        char x, y;
+        signed char x;
+        signed char y;
     } speed;
     const unsigned char (*bitmap)[][ANIMATION_STAGES];
     unsigned char stage;
@@ -17,7 +18,7 @@ struct kibble_t {
 
 void draw_kibbles(void);
 void move_kibbles(void);
-void create_kibble(unsigned char, unsigned short, unsigned char, char, char);
+void create_kibble(unsigned char, unsigned short, unsigned char, signed char, signed char);
 struct kibble_t *find_kibbles(unsigned short);
 
 #define init_kibbles()                   \

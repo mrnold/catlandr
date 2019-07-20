@@ -15,10 +15,12 @@ struct lander_t {
         unsigned char y;
     } previous;
     struct {
-        char x, y;
+        signed char x;
+        signed char y;
     } speed;
     struct {
-        char x, y;
+        signed char x;
+        signed char y;
     } acceleration;
     unsigned char hp_stage; // Horizontal positive
     unsigned char hp_firing;

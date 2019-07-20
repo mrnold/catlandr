@@ -19,11 +19,11 @@ extern void (*refresh)(void);
 #define setup_refresh(callback) refresh = callback
 
 void clear_screen(void) __naked;
-void draw_live_sprite(const unsigned char [8][4], unsigned char, unsigned short, unsigned char, char, char);
+void draw_live_sprite(const unsigned char [8][4], unsigned char, unsigned short, unsigned char, signed char, signed char);
 void draw_moon(void) __naked;
 void draw_status(void);
-void print(const char * const);
+void print(const signed char * const);
 void printnum(unsigned int);
-void printxy(unsigned char, unsigned char, const char * const);
+void printxy(unsigned char, unsigned char, const signed char * const);
 void printnumxy(unsigned char, unsigned char, unsigned int);
 void updatescreen(void);

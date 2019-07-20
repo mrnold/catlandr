@@ -57,7 +57,6 @@ void loop_game(void)
         if (crashes != 0xFFFF) { crashes++; } break;
     case DONE_LANDED:
         if (landings != 0xFFFF) { landings++; } break;
-    default:
     }
 }
 
