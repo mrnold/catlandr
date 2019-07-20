@@ -25,9 +25,14 @@ MODEL84pse := 8402
 CODELOC86 := 0xD748
 CODELOC84pse := 0x9D95
 
+OBJ_CALCS := $(addprefix $(OBJ)/, $(CALCS))
+BIN_CALCS := $(addprefix $(BIN)/, $(CALCS))
+
+ALLOCS = 3000
+
 .PHONY: all $(CALCS)
 
-all: 86 84pse
+all: $(CALCS)
 
 86: $(OBJ)/86/catlandr.p | $(BIN)/86
 	$(MOVE) $(call PATHSUB, $<) $(call PATHSUB, $(BIN)/86/catlandr.86p)
@@ -35,10 +40,10 @@ all: 86 84pse
 84pse: $(OBJ)/84pse/catlandr.p | $(BIN)/84pse
 	$(MOVE) $(call PATHSUB, $<) $(call PATHSUB, $(BIN)/84pse/catlandr.8xp)
 
-$(addprefix $(BIN)/, $(CALCS)): | $(BIN)
+$(BIN_CALCS): | $(BIN)
 	$(MKDIR) $(call PATHSUB, $@)
 
-$(addprefix $(OBJ)/, $(CALCS)): | $(OBJ)
+$(OBJ_CALCS): | $(OBJ)
 	$(MKDIR) $(call PATHSUB, $@)
 
 $(BIN):
@@ -48,22 +53,26 @@ $(OBJ):
 	$(MKDIR) $(call PATHSUB, $@)
 
 .SECONDEXPANSION:
-$(addsuffix /catlandr.p, $(addprefix $(OBJ)/, $(CALCS))): $(OBJ)/%/catlandr.p: $(OBJ)/%/catlandr.bin | $(OBJ)/$$*
+$(addsuffix /catlandr.p, $(OBJ_CALCS)): $(OBJ)/%/catlandr.p: $(OBJ)/%/catlandr.bin | $(OBJ)/$$*
 	$(PYTHON) tools/binto86p.py $* $< $@
 
-$(addsuffix /catlandr.bin, $(addprefix $(OBJ)/, $(CALCS))): $(OBJ)/%/catlandr.bin: $(OBJ)/%/main.ihx | $(OBJ)/$$*
+$(addsuffix /catlandr.bin, $(OBJ_CALCS)): $(OBJ)/%/catlandr.bin: $(OBJ)/%/main.ihx | $(OBJ)/$$*
 	$(PYTHON) tools/ihxtobin.py $<
 	$(PYTHON) tools/trim.py $(OBJ)/$*/main.map $(OBJ)/$*/main.bin $(CODELOC$*)
 	$(MOVE) $(call PATHSUB, $(OBJ)/$*/main.bin) $(call PATHSUB, $@)
 
-$(addsuffix /main.ihx, $(addprefix $(OBJ)/, $(CALCS))): $(OBJ)/%/main.ihx: $(addprefix $(OBJ)/%/, $(addsuffix .rel, $(SOURCES))) $(OBJ)/%/ti.rel | $(OBJ)/$$*
+$(addsuffix /main.ihx, $(OBJ_CALCS)): $(OBJ)/%/main.ihx: $(OBJ)/%/crt0.rel $(addprefix $(OBJ)/%/, $(addsuffix .rel, $(SOURCES))) $(OBJ)/%/ti.rel | $(OBJ)/$$*
 	$(SDLD) -m -w -x -i -b _CODE=$(CODELOC$*) -b _DATA=0x0000 $@ $^
 
-$(addsuffix /ti.rel, $(addprefix $(OBJ)/, $(CALCS))): $(OBJ)/%/ti.rel: source/calc/ti%/ti$$*.c | $(OBJ)/$$*
-	$(SDCC) --compile-only -mz80 --nostdlib --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node 300 -Isource -DCALCULATOR_MODEL=$(MODEL$*) $< -o $@
+$(addsuffix /ti.rel, $(OBJ_CALCS)): $(OBJ)/%/ti.rel: source/calc/ti%/ti$$*.c | $(OBJ)/$$*
+	$(SDCC) --compile-only -mz80 --nostdlib --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node $(ALLOCS) -Isource -DCALCULATOR_MODEL=$(MODEL$*) $< -o $@
 
-$(foreach calc, $(CALCS), $(addsuffix .rel, $(addprefix $(OBJ)/$(calc)/, $(SOURCES)))): %.rel : source/$$(notdir %).c | $(addprefix $(OBJ)/, $(CALCS))
-	$(SDCC) --compile-only -mz80 --nostdlib --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node 300 -Isource -DCALCULATOR_MODEL=$(MODEL$(subst /$(notdir $@),,$(subst $(OBJ)/,,$@))) $^ -o $@
+$(addsuffix /crt0.rel, $(OBJ_CALCS)): $(OBJ)/%/crt0.rel: source/calc/ti%/crt0.s | $(OBJ)/$$*
+	$(SDAS) -p -g -o $@ $<
+
+$(foreach calc, $(CALCS), $(addsuffix .rel, $(addprefix $(OBJ)/$(calc)/, $(SOURCES)))): %.rel : source/$$(notdir %).c | $(OBJ_CALCS)
+	$(SDCC) --compile-only -mz80 --nostdlib --no-std-crt0 --reserve-regs-iy --opt-code-speed --max-allocs-per-node $(ALLOCS) -Isource -DCALCULATOR_MODEL=$(MODEL$(subst /$(notdir $@),,$(subst $(OBJ)/,,$@))) $^ -o $@
 
 clean:
-	$(RMDIR) $(BIN) $(OBJ)
+	$(RMDIR) $(BIN)
+	$(RMDIR) $(OBJ)
