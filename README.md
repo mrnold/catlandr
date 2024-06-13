@@ -24,3 +24,5 @@ How to build (currently Windows only):
  - Get SDCC version 3.4.0
  - Get Python 2.7
  - Run build.bat from a command prompt
+
+<img src="docs/images/catlandr.gif">
